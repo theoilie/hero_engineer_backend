@@ -1,12 +1,6 @@
 version: '3.5'
 
 services:
-  hero_engineer_redis:
-    image: redis
-    container_name: hero_engineer_redis_container
-    networks:
-      - hero_engineer_network
-    entrypoint: redis-server --appendonly yes
   hero_engineer_mongo:
     image: mongo
     volumes:
@@ -25,7 +19,6 @@ services:
     container_name: hero_engineer_backend_container
     depends_on:
       - hero_engineer_mongo
-      - hero_engineer_redis
     networks:
       - hero_engineer_network
 

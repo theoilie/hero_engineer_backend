@@ -85,6 +85,10 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
             .antMatchers(
                 HttpMethod.GET,
                 "/api/hero/heroes"
+            )
+            .antMatchers(
+                    HttpMethod.GET,
+                    "/api/avatars/json/**"
             );
     }
 }

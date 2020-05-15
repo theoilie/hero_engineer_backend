@@ -31,6 +31,14 @@ public class User implements UserDetails {
     @Getter @Setter
     public String heroId;
     @Getter @Setter
+    public String avatarSVG;
+    @Getter @Setter
+    public AvatarDataMale avatarDataMale;
+    @Getter @Setter
+    public AvatarDataFemale avatarDataFemale;
+    @Getter @Setter
+    public AvatarDataColors avatarDataColors;
+    @Getter @Setter
     public int xp;
     @Getter @Setter
     public int points;
@@ -49,17 +57,25 @@ public class User implements UserDetails {
                 String username,
                 String password,
                 String heroId,
+                String avatarSVG,
+                AvatarDataMale avatarDataMale,
+                AvatarDataFemale avatarDataFemale,
+                AvatarDataColors avatarDataColors,
                 int xp,
                 int points,
                 List<Quest> quests,
                 boolean isProf) {
-        this(email, username, password, heroId, xp, points, quests, isProf, "student");
+        this(email, username, password, heroId, avatarSVG, avatarDataMale, avatarDataFemale, avatarDataColors, xp, points, quests, isProf, "student");
     }
 
     public User(String email,
                 String username,
                 String password,
                 String heroId,
+                String avatarSVG,
+                AvatarDataMale avatarDataMale,
+                AvatarDataFemale avatarDataFemale,
+                AvatarDataColors avatarDataColors,
                 int xp,
                 int points,
                 List<Quest> quests,
@@ -69,6 +85,10 @@ public class User implements UserDetails {
         this.username = username;
         this.password = password;
         this.heroId = heroId;
+        this.avatarSVG = avatarSVG;
+        this.avatarDataMale = avatarDataMale;
+        this.avatarDataFemale = avatarDataFemale;
+        this.avatarDataColors = avatarDataColors;
         this.xp = xp;
         this.points = points;
         this.quests = quests;
