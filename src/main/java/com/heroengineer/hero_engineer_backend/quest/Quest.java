@@ -27,6 +27,12 @@ public class Quest {
     @Getter @Setter
     public boolean completeWithQuizzes; // Whether or not this quest is automatically completed by taking a quiz
     @Getter @Setter
+    public boolean completeWithCode; // Whether or not this quest is automatically completed by entering a code
+    @Getter @Setter
+    public boolean completeWithQuizzesAndCode; // Whether or not this quest is automatically completed by both taking a quiz AND entering a code
+    @Getter @Setter
+    public String code; // The code that the student can enter to complete this quest
+    @Getter @Setter
     public List<String> incompleteQuizIds; // IDs of quizzes that must be completed to finish this quest
     @Getter @Setter
     public List<GradedQuiz> completedQuizzes; // Quizzes that the user already completed for this quest
@@ -41,6 +47,9 @@ public class Quest {
                  boolean main,
                  boolean complete,
                  boolean completeWithQuizzes,
+                 boolean completeWithCode,
+                 boolean completeWithQuizzesAndCode,
+                 String code,
                  List<String> incompleteQuizIds,
                  List<GradedQuiz> completedQuizzes,
                  List<String> requiredQuestIds) {
@@ -50,6 +59,9 @@ public class Quest {
         this.main = main;
         this.complete = complete;
         this.completeWithQuizzes = completeWithQuizzes;
+        this.completeWithCode = completeWithCode;
+        this.completeWithQuizzesAndCode = completeWithQuizzesAndCode;
+        this.code = code;
         this.incompleteQuizIds = incompleteQuizIds;
         this.completedQuizzes = completedQuizzes;
         this.requiredQuestIds = requiredQuestIds;
@@ -62,6 +74,9 @@ public class Quest {
                  boolean main,
                  boolean complete,
                  boolean completeWithQuizzes,
+                 boolean completeWithCode,
+                 boolean completeWithQuizzesAndCode,
+                 String code,
                  List<String> incompleteQuizIds,
                  List<GradedQuiz> completedQuizzes,
                  List<String> requiredQuestIds) {
@@ -72,6 +87,9 @@ public class Quest {
         this.main = main;
         this.complete = complete;
         this.completeWithQuizzes = completeWithQuizzes;
+        this.completeWithCode = completeWithCode;
+        this.completeWithQuizzesAndCode = completeWithQuizzesAndCode;
+        this.code = code;
         this.incompleteQuizIds = incompleteQuizIds;
         this.completedQuizzes = completedQuizzes;
         this.requiredQuestIds = requiredQuestIds;
@@ -86,6 +104,9 @@ public class Quest {
         this.main = quest.isMain();
         this.complete = quest.isComplete();
         this.completeWithQuizzes = quest.isCompleteWithQuizzes();
+        this.completeWithCode = quest.isCompleteWithCode();
+        this.completeWithQuizzesAndCode = quest.isCompleteWithQuizzesAndCode();
+        this.code = quest.getCode();
         this.incompleteQuizIds = quest.getIncompleteQuizIds();
         this.completedQuizzes = quest.getCompletedQuizzes();
         this.requiredQuestIds = quest.getRequiredQuestIds();

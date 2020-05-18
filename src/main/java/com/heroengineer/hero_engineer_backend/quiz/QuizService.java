@@ -72,4 +72,13 @@ public class QuizService {
         }
     }
 
+    public void awardXP(User user, Quest quest) {
+        double totalPercentCorrect = 0;
+        for (GradedQuiz otherGradedQuiz : quest.getCompletedQuizzes()) {
+            totalPercentCorrect += otherGradedQuiz.getGradePercent();
+        }
+        double avgPercentCorrect = totalPercentCorrect / quest.getCompletedQuizzes().size();
+        user.setXp(user.getXp() + (int) (avgPercentCorrect * quest.getAutomaticXpReward()));
+    }
+
 }

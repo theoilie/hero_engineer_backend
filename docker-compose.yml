@@ -4,7 +4,7 @@ services:
   hero_engineer_mongo:
     image: mongo
     volumes:
-      - ~/hero_engineer_data/mongo/data:/data/db\
+      - ~/hero_engineer_data/mongo/data:/data/db
     container_name: hero_engineer_mongo_container
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin

@@ -34,6 +34,8 @@ public class QuestService {
                         userQuest.setAutomaticXpReward(quest.getAutomaticXpReward());
                         userQuest.setMain(quest.isMain());
                         userQuest.setCompleteWithQuizzes(quest.isCompleteWithQuizzes());
+                        userQuest.setCompleteWithCode(quest.isCompleteWithCode());
+                        userQuest.setCompleteWithQuizzesAndCode(quest.isCompleteWithQuizzesAndCode());
                         userQuest.setRequiredQuestIds(quest.getRequiredQuestIds());
                         for (String quizId : quest.getIncompleteQuizIds()) {
                             if (!userQuest.getIncompleteQuizIds().contains(quizId)

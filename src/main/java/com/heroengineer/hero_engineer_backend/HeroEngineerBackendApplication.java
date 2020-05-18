@@ -11,6 +11,8 @@ import com.heroengineer.hero_engineer_backend.quiz.QuizQuestion;
 import com.heroengineer.hero_engineer_backend.quiz.QuizRepository;
 import com.heroengineer.hero_engineer_backend.user.User;
 import com.heroengineer.hero_engineer_backend.user.UserRepository;
+import com.heroengineer.hero_engineer_backend.user.UserWhitelist;
+import com.heroengineer.hero_engineer_backend.user.UserWhitelistRepository;
 import io.jsonwebtoken.SignatureAlgorithm;
 import org.bson.codecs.ObjectIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +35,18 @@ public class HeroEngineerBackendApplication {
 
     @Autowired
     HeroEngineerBackendApplication(UserRepository userRepo,
+                                   UserWhitelistRepository userWhitelistRepo,
                                    HeroRepository heroRepo,
                                    QuestRepository questRepo,
                                    QuizRepository quizRepo,
                                    QuestService questService) {
 
         // Insert starter data if the database is empty
+        if (userWhitelistRepo.count() == 0
+                || userWhitelistRepo.findById("default").isEmpty()
+                | userWhitelistRepo.findById("default").get().getEmails().isEmpty()) {
+            userWhitelistRepo.insert(new UserWhitelist("default", Collections.singletonList("admin@usc.edu")));
+        }
         if (userRepo.count() == 0) {
             if (heroRepo.count() == 0) {
                 heroRepo.insert(new Hero("Example Hero Name", "Example Hero Description"));
@@ -223,6 +231,9 @@ public class HeroEngineerBackendApplication {
                     true,
                     false,
                     true,
+                    false,
+                    false,
+                    "",
                     Collections.singletonList(quiz1.getId()),
                     null,
                     null
@@ -235,6 +246,9 @@ public class HeroEngineerBackendApplication {
                     false,
                     false,
                     true,
+                    true,
+                    true,
+                    "",
                     Collections.singletonList(quiz2.getId()),
                     null,
                     Collections.singletonList(quest1.getId())

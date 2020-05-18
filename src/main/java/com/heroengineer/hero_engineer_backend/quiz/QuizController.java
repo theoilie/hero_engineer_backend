@@ -186,15 +186,10 @@ public class QuizController {
         quest.getIncompleteQuizIds().remove(globalQuiz.getId());
         if (quest.getIncompleteQuizIds().isEmpty()) {
             // Award XP if this was the last quiz the user needed to complete for this quest
-            double totalPercentCorrect = 0;
-            for (GradedQuiz otherGradedQuiz : quest.getCompletedQuizzes()) {
-                totalPercentCorrect += otherGradedQuiz.getGradePercent();
-            }
-            double avgPercentCorrect = totalPercentCorrect / quest.getCompletedQuizzes().size();
-            user.setXp(user.getXp() + (int) (avgPercentCorrect * quest.getAutomaticXpReward()));
+            quizService.awardXP(user, quest);
 
             // Complete the quest if this was the last quiz and completeWithQuizzes is true
-            if (quest.isCompleteWithQuizzes()) {
+            if (quest.isCompleteWithQuizzes() && !quest.isCompleteWithQuizzesAndCode()) {
                 quest.setComplete(true);
             }
         }

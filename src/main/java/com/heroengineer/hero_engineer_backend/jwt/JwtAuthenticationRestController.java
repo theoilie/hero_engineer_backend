@@ -1,10 +1,13 @@
 package com.heroengineer.hero_engineer_backend.jwt;
 
+import java.util.Collections;
 import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 
 import com.heroengineer.hero_engineer_backend.user.User;
+import com.heroengineer.hero_engineer_backend.user.UserWhitelist;
+import com.heroengineer.hero_engineer_backend.user.UserWhitelistRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -31,19 +34,29 @@ public class JwtAuthenticationRestController {
   private final AuthenticationManager authenticationManager;
   private final JwtTokenUtil jwtTokenUtil;
   private final MongoUserDetailsService mongoUserDetailsService;
+  private final UserWhitelistRepository userWhitelistRepo;
 
   @Autowired
   public JwtAuthenticationRestController(AuthenticationManager authenticationManager,
                                          JwtTokenUtil jwtTokenUtil,
-                                         MongoUserDetailsService mongoUserDetailsService) {
+                                         MongoUserDetailsService mongoUserDetailsService,
+                                         UserWhitelistRepository userWhitelistRepo) {
     this.authenticationManager = authenticationManager;
     this.jwtTokenUtil = jwtTokenUtil;
     this.mongoUserDetailsService = mongoUserDetailsService;
+    this.userWhitelistRepo = userWhitelistRepo;
   }
 
   @RequestMapping(value = "${jwt.get.token.uri}", method = RequestMethod.POST)
   public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtTokenRequest authenticationRequest)
       throws AuthenticationException {
+    UserWhitelist whitelist = userWhitelistRepo
+            .findById("default")
+            .orElse(new UserWhitelist("default", Collections.singletonList("admin@usc.edu")));
+    if (!whitelist.getEmails().contains(authenticationRequest.getUsername())) {
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"The email address you gave is not on the registrar for this semester. Please try a different email or contact Professor Ramsey.\"}");
+    }
+
     authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
 
     final User userDetails = mongoUserDetailsService.loadUserByUsername(authenticationRequest.getUsername());
