@@ -234,6 +234,7 @@ public class HeroEngineerBackendApplication {
                     false,
                     false,
                     "",
+                    "",
                     Collections.singletonList(quiz1.getId()),
                     null,
                     null
@@ -248,6 +249,7 @@ public class HeroEngineerBackendApplication {
                     true,
                     true,
                     true,
+                    "",
                     "",
                     Collections.singletonList(quiz2.getId()),
                     null,

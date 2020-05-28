@@ -33,6 +33,8 @@ public class Quest {
     @Getter @Setter
     public String code; // The code that the student can enter to complete this quest
     @Getter @Setter
+    public String universalCode; // The code that any student can enter to complete this quest
+    @Getter @Setter
     public List<String> incompleteQuizIds; // IDs of quizzes that must be completed to finish this quest
     @Getter @Setter
     public List<GradedQuiz> completedQuizzes; // Quizzes that the user already completed for this quest
@@ -50,6 +52,7 @@ public class Quest {
                  boolean completeWithCode,
                  boolean completeWithQuizzesAndCode,
                  String code,
+                 String universalCode,
                  List<String> incompleteQuizIds,
                  List<GradedQuiz> completedQuizzes,
                  List<String> requiredQuestIds) {
@@ -62,6 +65,7 @@ public class Quest {
         this.completeWithCode = completeWithCode;
         this.completeWithQuizzesAndCode = completeWithQuizzesAndCode;
         this.code = code;
+        this.universalCode = universalCode;
         this.incompleteQuizIds = incompleteQuizIds;
         this.completedQuizzes = completedQuizzes;
         this.requiredQuestIds = requiredQuestIds;
@@ -77,6 +81,7 @@ public class Quest {
                  boolean completeWithCode,
                  boolean completeWithQuizzesAndCode,
                  String code,
+                 String universalCode,
                  List<String> incompleteQuizIds,
                  List<GradedQuiz> completedQuizzes,
                  List<String> requiredQuestIds) {
@@ -90,6 +95,7 @@ public class Quest {
         this.completeWithCode = completeWithCode;
         this.completeWithQuizzesAndCode = completeWithQuizzesAndCode;
         this.code = code;
+        this.universalCode = universalCode;
         this.incompleteQuizIds = incompleteQuizIds;
         this.completedQuizzes = completedQuizzes;
         this.requiredQuestIds = requiredQuestIds;
@@ -107,6 +113,7 @@ public class Quest {
         this.completeWithCode = quest.isCompleteWithCode();
         this.completeWithQuizzesAndCode = quest.isCompleteWithQuizzesAndCode();
         this.code = quest.getCode();
+        this.universalCode = quest.getUniversalCode();
         this.incompleteQuizIds = quest.getIncompleteQuizIds();
         this.completedQuizzes = quest.getCompletedQuizzes();
         this.requiredQuestIds = quest.getRequiredQuestIds();

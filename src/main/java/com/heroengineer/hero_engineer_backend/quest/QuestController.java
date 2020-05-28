@@ -70,7 +70,7 @@ public class QuestController {
     }
 
     @PutMapping("/generateCode")
-    public ResponseEntity<String> saveQuestForUser(HttpServletRequest request, @Valid @RequestBody GenerateCodeRequest body) {
+    public ResponseEntity<String> generateCodeForStudent(HttpServletRequest request, @Valid @RequestBody GenerateCodeRequest body) {
         if (!userService.isProf(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
         }
@@ -86,6 +86,22 @@ public class QuestController {
 
         userQuest.setCode(generateCode());
         userRepo.save(user);
+        return ResponseEntity.ok().body("{\"error\": \"\"}");
+    }
+
+    @PutMapping("/generateUniversalCode")
+    public ResponseEntity<String> generateCodeForQuest(HttpServletRequest request, @Valid @RequestBody GenerateCodeRequest body) {
+        if (!userService.isProf(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
+        }
+
+        Quest quest = questRepo.findById(body.getQuestId()).orElse(null);
+        if (quest == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"No quest with the given ID could be found.\"}");
+        }
+
+        quest.setUniversalCode(generateCode());
+        questRepo.save(quest);
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 
@@ -146,10 +162,12 @@ public class QuestController {
         if (quest == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"No user quest matches the ID given\"}");
         }
-        if ((!quest.isCompleteWithCode() && !quest.isCompleteWithQuizzesAndCode()) || quest.getCode() == null || quest.getCode().isEmpty()) {
+        if ((!quest.isCompleteWithCode() && !quest.isCompleteWithQuizzesAndCode()) ||
+                (quest.getCode() == null || quest.getCode().isEmpty() && quest.getUniversalCode() != null && !quest.getUniversalCode().isEmpty()) ||
+                (quest.getUniversalCode() == null || quest.getUniversalCode().isEmpty() && quest.getCode() != null && !quest.getCode().isEmpty())) {
             return ResponseEntity.ok().body("{\"error\": \"No code to complete this quest is available at this time.\"}");
         }
-        if (!quest.getCode().equals(code.getCode())) {
+        if (!quest.getCode().equals(code.getCode()) && !quest.getUniversalCode().equals(code.getCode())) {
             return ResponseEntity.ok().body("{\"error\": \"Invalid code.\"}");
         }
 
@@ -191,6 +209,19 @@ public class QuestController {
 
         public GenerateCodeRequest(String userEmail, String questId) {
             this.userEmail = userEmail;
+            this.questId = questId;
+        }
+
+    }
+
+    private static class GenerateUniversalCodeRequest {
+
+        @Getter @Setter
+        public String questId;
+
+        public GenerateUniversalCodeRequest() {}
+
+        public GenerateUniversalCodeRequest(String questId) {
             this.questId = questId;
         }
 
