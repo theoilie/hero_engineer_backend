@@ -157,27 +157,29 @@ public class QuestController {
         }
 
         User user = userRepo.findByEmailIgnoreCase(email);
-        Quest quest = user.getQuests().stream()
+        Quest userQuest = user.getQuests().stream()
                 .filter(q -> q.getId().equals(code.getQuestId())).findFirst().orElse(null);
-        if (quest == null) {
+        Quest globalQuest = questRepo.findById(code.getQuestId()).orElse(null);
+        if (userQuest == null || globalQuest == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"No user quest matches the ID given\"}");
         }
-        if ((!quest.isCompleteWithCode() && !quest.isCompleteWithQuizzesAndCode()) ||
-                (quest.getCode() == null || quest.getCode().isEmpty() && quest.getUniversalCode() != null && !quest.getUniversalCode().isEmpty()) ||
-                (quest.getUniversalCode() == null || quest.getUniversalCode().isEmpty() && quest.getCode() != null && !quest.getCode().isEmpty())) {
+        String individualCode = (globalQuest.getCode() == null || globalQuest.getCode().isEmpty()) ? "" : globalQuest.getCode();
+        String universalCode = (globalQuest.getUniversalCode() == null || globalQuest.getUniversalCode().isEmpty()) ? "" : globalQuest.getUniversalCode();
+        if ((!globalQuest.isCompleteWithCode() && !globalQuest.isCompleteWithQuizzesAndCode()) ||
+                (individualCode.isEmpty() && universalCode.isEmpty())) {
             return ResponseEntity.ok().body("{\"error\": \"No code to complete this quest is available at this time.\"}");
         }
-        if (!quest.getCode().equals(code.getCode()) && !quest.getUniversalCode().equals(code.getCode())) {
+        if (!individualCode.equals(code.getCode()) && !universalCode.equals(code.getCode())) {
             return ResponseEntity.ok().body("{\"error\": \"Invalid code.\"}");
         }
 
-        if ((!quest.isCompleteWithQuizzesAndCode() && quest.isCompleteWithCode())
-                || quest.getIncompleteQuizIds().isEmpty()) {
-            quest.setComplete(true);
-            if (quest.getIncompleteQuizIds().isEmpty() && !quest.getCompletedQuizzes().isEmpty()) {
-                quizService.awardXP(user, quest);
+        if ((!globalQuest.isCompleteWithQuizzesAndCode() && globalQuest.isCompleteWithCode())
+                || userQuest.getIncompleteQuizIds().isEmpty()) {
+            userQuest.setComplete(true);
+            if (userQuest.getIncompleteQuizIds().isEmpty() && !userQuest.getCompletedQuizzes().isEmpty()) {
+                quizService.awardXP(user, userQuest);
             } else {
-                user.setXp(user.getXp() + quest.getAutomaticXpReward());
+                user.setXp(user.getXp() + userQuest.getAutomaticXpReward());
             }
             userRepo.save(user);
         }
