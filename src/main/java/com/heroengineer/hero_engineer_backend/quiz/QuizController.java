@@ -97,6 +97,7 @@ public class QuizController {
         if (quiz.getQuestionBank() == null) quiz.setQuestionBank(new ArrayList<>());
         for (QuizQuestion question : quiz.getQuestionBank()) {
             if (question.getId() == null) question.setId(new ObjectIdGenerator().generate().toString());
+            if (question.getAnswerOptions() == null) question.setAnswerOptions(new ArrayList<>());
             for (QuizAnswer answer : question.getAnswerOptions()) {
                 if (answer.getId() == null) answer.setId(new ObjectIdGenerator().generate().toString());
             }
