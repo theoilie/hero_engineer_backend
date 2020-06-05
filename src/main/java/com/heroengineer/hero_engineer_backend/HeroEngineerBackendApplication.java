@@ -2,6 +2,8 @@ package com.heroengineer.hero_engineer_backend;
 
 import com.heroengineer.hero_engineer_backend.hero.Hero;
 import com.heroengineer.hero_engineer_backend.hero.HeroRepository;
+import com.heroengineer.hero_engineer_backend.herocouncil.GrandChallenge;
+import com.heroengineer.hero_engineer_backend.herocouncil.GrandChallengeRepository;
 import com.heroengineer.hero_engineer_backend.quest.Quest;
 import com.heroengineer.hero_engineer_backend.quest.QuestRepository;
 import com.heroengineer.hero_engineer_backend.quest.QuestService;
@@ -42,9 +44,16 @@ public class HeroEngineerBackendApplication {
                                    QuestRepository questRepo,
                                    QuizRepository quizRepo,
                                    SectionRepository sectionRepo,
+                                   GrandChallengeRepository grandChallengeRepo,
                                    QuestService questService) {
 
         // Insert starter data if the database is empty
+        if (grandChallengeRepo.count() == 0) {
+            grandChallengeRepo.save(new GrandChallenge("sustainability", "SUSTAINABILITY", "Sustainability"));
+            grandChallengeRepo.save(new GrandChallenge("health", "HEALTH", "Health"));
+            grandChallengeRepo.save(new GrandChallenge("security", "SECURITY", "Security"));
+            grandChallengeRepo.save(new GrandChallenge("joy_of_living", "JOY_OF_LIVING", "Joy of Living"));
+        }
         if (userWhitelistRepo.count() == 0
                 || userWhitelistRepo.findById("default").isEmpty()
                 | userWhitelistRepo.findById("default").get().getEmails().isEmpty()) {
@@ -67,6 +76,11 @@ public class HeroEngineerBackendApplication {
                     0,
                     0,
                     new ArrayList<>(),
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
                     true
             ));
         }

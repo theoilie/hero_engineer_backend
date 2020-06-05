@@ -5,6 +5,7 @@ import com.heroengineer.hero_engineer_backend.quiz.QuizService;
 import com.heroengineer.hero_engineer_backend.user.User;
 import com.heroengineer.hero_engineer_backend.user.UserRepository;
 import com.heroengineer.hero_engineer_backend.user.UserService;
+import com.heroengineer.hero_engineer_backend.util.UtilService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.Optional;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +32,7 @@ public class QuestController {
     private final QuestService questService;
     private final QuizService quizService;
     private final JwtTokenUtil jwtTokenUtil;
+    private final UtilService util;
 
     @Autowired
     public QuestController(QuestRepository questRepo,
@@ -39,13 +40,15 @@ public class QuestController {
                            UserService userService,
                            QuestService questService,
                            QuizService quizService,
-                           JwtTokenUtil jwtTokenUtil) {
+                           JwtTokenUtil jwtTokenUtil,
+                           UtilService util) {
         this.questRepo = questRepo;
         this.userRepo = userRepo;
         this.userService = userService;
         this.questService = questService;
         this.quizService = quizService;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.util = util;
     }
 
     @GetMapping("/quests")
@@ -82,13 +85,13 @@ public class QuestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"User does not have a quest with the given ID.\"}");
         }
 
-        userQuest.setCode(generateCode());
+        userQuest.setCode(util.generateCode());
         userRepo.save(user);
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 
     @PutMapping("/generateUniversalCode")
-    public ResponseEntity<String> generateCodeForQuest(HttpServletRequest request, @Valid @RequestBody GenerateCodeRequest body) {
+    public ResponseEntity<String> generateCodeForQuest(HttpServletRequest request, @Valid @RequestBody GenerateUniversalCodeRequest body) {
         if (!userService.isProf(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
         }
@@ -98,7 +101,7 @@ public class QuestController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"No quest with the given ID could be found.\"}");
         }
 
-        quest.setUniversalCode(generateCode());
+        quest.setUniversalCode(util.generateCode());
         questRepo.save(quest);
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
@@ -183,19 +186,6 @@ public class QuestController {
         }
 
         return ResponseEntity.ok().body("{\"error\": \"\"}");
-    }
-
-    private static String generateCode() {
-        int leftLimit = 48; // numeral '0'
-        int rightLimit = 122; // letter 'z'
-        int targetStringLength = 16;
-        Random random = new Random();
-
-        return random.ints(leftLimit, rightLimit + 1)
-                .filter(i -> (i <= 57 || i >= 65) && (i <= 90 || i >= 97))
-                .limit(targetStringLength)
-                .collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
-                .toString();
     }
 
     private static class GenerateCodeRequest {

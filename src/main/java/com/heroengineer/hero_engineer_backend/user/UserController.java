@@ -170,6 +170,23 @@ public class UserController {
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 
+    @PostMapping("/setIdeas")
+    public ResponseEntity<String> setIdeas(HttpServletRequest request, @RequestBody SetIdeasRequest body) {
+        String email = jwtTokenUtil.getUsernameFromRequest(request);
+
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"JWT not accepted\"}");
+        }
+
+        User user = userRepo.findByEmailIgnoreCase(email);
+        user.setIdea1(body.getIdea1());
+        user.setIdea2(body.getIdea2());
+        user.setIdea3(body.getIdea3());
+        userRepo.save(user);
+
+        return ResponseEntity.ok().body("{\"error\": \"\"}");
+    }
+
     private static class ChangeWhitelistRequest {
 
         @Getter @Setter
@@ -198,6 +215,23 @@ public class UserController {
             this.avatarDataMale = avatarDataMale;
             this.avatarDataFemale = avatarDataFemale;
             this.avatarDataColors = avatarDataColors;
+        }
+
+    }
+
+    @Getter @Setter
+    private static class SetIdeasRequest {
+
+        public String idea1;
+        public String idea2;
+        public String idea3;
+
+        public SetIdeasRequest() {}
+
+        public SetIdeasRequest(String idea1, String idea2, String idea3) {
+            this.idea1 = idea1;
+            this.idea2 = idea2;
+            this.idea3 = idea3;
         }
 
     }

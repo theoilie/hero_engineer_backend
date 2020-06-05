@@ -18,6 +18,7 @@ import java.util.List;
  * MongoDB representation of a student.
  */
 public class User implements UserDetails {
+
     @Id @Getter @JsonIgnore
     public String id;
     // TODO: Improve the regular expression
@@ -45,6 +46,16 @@ public class User implements UserDetails {
     @Getter @Setter
     public List<Quest> quests;
     @Getter @Setter
+    public String grandChallengeCategory;
+    @Getter @Setter
+    public String grandChallengeCode;
+    @Getter @Setter
+    public String idea1;
+    @Getter @Setter
+    public String idea2;
+    @Getter @Setter
+    public String idea3;
+    @Getter @Setter
     public boolean isProf;
     @Getter @Setter
     public String role;
@@ -64,8 +75,32 @@ public class User implements UserDetails {
                 int xp,
                 int points,
                 List<Quest> quests,
+                String grandChallengeCategory,
+                String grandChallengeCode,
+                String idea1,
+                String idea2,
+                String idea3,
                 boolean isProf) {
-        this(email, username, password, heroId, avatarSVG, avatarDataMale, avatarDataFemale, avatarDataColors, xp, points, quests, isProf, "student");
+        this(
+                email,
+                username,
+                password,
+                heroId,
+                avatarSVG,
+                avatarDataMale,
+                avatarDataFemale,
+                avatarDataColors,
+                xp,
+                points,
+                quests,
+                grandChallengeCategory,
+                grandChallengeCode,
+                idea1,
+                idea2,
+                idea3,
+                isProf,
+                "student"
+        );
     }
 
     public User(String email,
@@ -79,6 +114,11 @@ public class User implements UserDetails {
                 int xp,
                 int points,
                 List<Quest> quests,
+                String grandChallengeCategory,
+                String grandChallengeCode,
+                String idea1,
+                String idea2,
+                String idea3,
                 boolean isProf,
                 String role) {
         this.email = email;
@@ -92,6 +132,11 @@ public class User implements UserDetails {
         this.xp = xp;
         this.points = points;
         this.quests = quests;
+        this.grandChallengeCategory = grandChallengeCategory;
+        this.grandChallengeCode = grandChallengeCode;
+        this.idea1 = idea1;
+        this.idea2 = idea2;
+        this.idea3 = idea3;
         this.isProf = isProf;
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
@@ -128,8 +173,4 @@ public class User implements UserDetails {
         return true;
     }
 
-    @Override
-    public String toString() {
-        return String.format("User[id=%s, email=%s, username=%s, heroId=%s, isProf=%b]", id, email, username, heroId, isProf);
-    }
 }
