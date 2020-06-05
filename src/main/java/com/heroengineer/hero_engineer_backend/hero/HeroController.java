@@ -10,12 +10,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
-// TODO: Add origins value so that only the web server (and not students) can use REST
-
 /**
  * REST controller for heroes.
  */
-@CrossOrigin
+@CrossOrigin("${origins}")
 @RestController
 @RequestMapping("/api/hero")
 public class HeroController {
@@ -53,4 +51,5 @@ public class HeroController {
         repo.deleteById(id);
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
+
 }

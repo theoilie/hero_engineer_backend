@@ -18,12 +18,10 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-// TODO: Add origins value so that only the web server (and not students) can use REST
-
 /**
  * REST controller for quests.
  */
-@CrossOrigin
+@CrossOrigin("${origins}")
 @RestController
 @RequestMapping("/api/quest")
 public class QuestController {

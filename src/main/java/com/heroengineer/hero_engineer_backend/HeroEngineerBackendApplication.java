@@ -9,6 +9,8 @@ import com.heroengineer.hero_engineer_backend.quiz.Quiz;
 import com.heroengineer.hero_engineer_backend.quiz.QuizAnswer;
 import com.heroengineer.hero_engineer_backend.quiz.QuizQuestion;
 import com.heroengineer.hero_engineer_backend.quiz.QuizRepository;
+import com.heroengineer.hero_engineer_backend.section.Section;
+import com.heroengineer.hero_engineer_backend.section.SectionRepository;
 import com.heroengineer.hero_engineer_backend.user.User;
 import com.heroengineer.hero_engineer_backend.user.UserRepository;
 import com.heroengineer.hero_engineer_backend.user.UserWhitelist;
@@ -39,6 +41,7 @@ public class HeroEngineerBackendApplication {
                                    HeroRepository heroRepo,
                                    QuestRepository questRepo,
                                    QuizRepository quizRepo,
+                                   SectionRepository sectionRepo,
                                    QuestService questService) {
 
         // Insert starter data if the database is empty
@@ -66,6 +69,9 @@ public class HeroEngineerBackendApplication {
                     new ArrayList<>(),
                     true
             ));
+        }
+        if (sectionRepo.count() == 0) {
+            sectionRepo.insert(new Section("admin", "admin", Collections.singletonList("admin@usc.edu")));
         }
         if (questRepo.count() == 0 && quizRepo.count() == 0) {
             Quiz quiz1 = new Quiz(

@@ -11,12 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.*;
 
-// TODO: Add origins value so that only the web server (and not students) can use REST
-
 /**
  * REST controller for avatars.
  */
-@CrossOrigin
+@CrossOrigin("${origins}")
 @RestController
 @RequestMapping("/api/avatars")
 public class AvatarsController {

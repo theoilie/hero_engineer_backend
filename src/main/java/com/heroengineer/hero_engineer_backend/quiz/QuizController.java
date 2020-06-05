@@ -16,12 +16,10 @@ import javax.validation.Valid;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
-// TODO: Add origins value so that only the web server (and not students) can use REST
-
 /**
  * REST controller for quizzes.
  */
-@CrossOrigin
+@CrossOrigin("${origins}")
 @RestController
 @RequestMapping("/api/quiz")
 public class QuizController {
