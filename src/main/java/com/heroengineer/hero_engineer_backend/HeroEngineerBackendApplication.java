@@ -2,6 +2,7 @@ package com.heroengineer.hero_engineer_backend;
 
 import com.heroengineer.hero_engineer_backend.hero.Hero;
 import com.heroengineer.hero_engineer_backend.hero.HeroRepository;
+import com.heroengineer.hero_engineer_backend.herocouncil.FileStorageProperties;
 import com.heroengineer.hero_engineer_backend.herocouncil.GrandChallenge;
 import com.heroengineer.hero_engineer_backend.herocouncil.GrandChallengeRepository;
 import com.heroengineer.hero_engineer_backend.quest.Quest;
@@ -22,6 +23,7 @@ import org.bson.codecs.ObjectIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,6 +37,9 @@ import java.util.Collections;
 import static io.jsonwebtoken.security.Keys.secretKeyFor;
 
 @SpringBootApplication
+@EnableConfigurationProperties({
+        FileStorageProperties.class
+})
 public class HeroEngineerBackendApplication {
 
     @Autowired

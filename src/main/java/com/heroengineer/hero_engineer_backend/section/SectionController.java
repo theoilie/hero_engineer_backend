@@ -67,7 +67,7 @@ public class SectionController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"JWT not accepted\"}");
         }
         for (Section section : repo.findAll()) {
-            if (section.getEmails().contains(email)) {
+            if (section.getEmails().contains(email.toLowerCase())) {
                 List<User> classmates = new ArrayList<>();
                 for (String classmateEmail : section.getEmails()) {
                     if (classmateEmail.equals(email)) continue;
@@ -87,6 +87,12 @@ public class SectionController {
         if (!userService.isProf(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
         }
+
+        List<String> emails = new ArrayList<>();
+        for (String email : section.getEmails()) {
+            emails.add(email.toLowerCase());
+        }
+        section.setEmails(emails);
 
         repo.save(section);
         return ResponseEntity.ok().body("{\"error\": \"\"}");
