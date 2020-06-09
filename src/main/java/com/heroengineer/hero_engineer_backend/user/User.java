@@ -58,6 +58,8 @@ public class User implements UserDetails {
     @Getter @Setter
     public boolean isProf;
     @Getter @Setter
+    public boolean resetPasswordOnLogin;
+    @Getter @Setter
     public String role;
 
     private Collection<? extends GrantedAuthority> authorities;
@@ -80,7 +82,8 @@ public class User implements UserDetails {
                 String idea1,
                 String idea2,
                 String idea3,
-                boolean isProf) {
+                boolean isProf,
+                boolean resetPasswordOnLogin) {
         this(
                 email,
                 username,
@@ -99,6 +102,7 @@ public class User implements UserDetails {
                 idea2,
                 idea3,
                 isProf,
+                resetPasswordOnLogin,
                 "student"
         );
     }
@@ -120,6 +124,7 @@ public class User implements UserDetails {
                 String idea2,
                 String idea3,
                 boolean isProf,
+                boolean resetPasswordOnLogin,
                 String role) {
         this.email = email;
         this.username = username;
@@ -138,6 +143,7 @@ public class User implements UserDetails {
         this.idea2 = idea2;
         this.idea3 = idea3;
         this.isProf = isProf;
+        this.resetPasswordOnLogin = resetPasswordOnLogin;
 
         List<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(role));

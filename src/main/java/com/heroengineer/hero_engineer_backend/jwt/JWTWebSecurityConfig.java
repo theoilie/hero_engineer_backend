@@ -76,11 +76,9 @@ public class JWTWebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity webSecurity) throws Exception {
         webSecurity
             .ignoring()
-            .antMatchers(
-                HttpMethod.POST,
-                authenticationPath
-            )
+            .antMatchers(HttpMethod.POST, authenticationPath)
             .antMatchers(HttpMethod.POST, "/api/user/create")
+            .antMatchers(HttpMethod.POST, "/api/user/setPassword")
             .antMatchers(HttpMethod.OPTIONS, "/**")
             .antMatchers(
                 HttpMethod.GET,

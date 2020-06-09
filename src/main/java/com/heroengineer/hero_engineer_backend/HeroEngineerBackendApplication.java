@@ -86,7 +86,8 @@ public class HeroEngineerBackendApplication {
                     "",
                     "",
                     "",
-                    true
+                    true,
+                    false
             ));
         }
         if (sectionRepo.count() == 0) {

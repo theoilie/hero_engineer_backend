@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -111,6 +112,29 @@ public class UserController {
         user.setPoints(0);
         user.setProf(false);
         userRepo.insert(user);
+        return ResponseEntity.ok().body("{\"error\": \"\"}");
+    }
+
+    @PostMapping("/resetPassword")
+    public ResponseEntity<String> resetPassword(HttpServletRequest request, @Valid @RequestBody ResetPasswordRequest body) {
+        if (!userService.isProf(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
+        }
+
+        User user = userRepo.findByEmailIgnoreCase(body.getEmail());
+        user.setResetPasswordOnLogin(body.isResetPassword());
+        userRepo.save(user);
+        return ResponseEntity.ok().body("{\"error\": \"\"}");
+    }
+
+    @PostMapping("/setPassword")
+    public ResponseEntity<String> setPassword(HttpServletRequest request, @Valid @RequestBody SetPasswordRequest body) {
+        User user = userRepo.findByEmailIgnoreCase(body.getEmail());
+        if (user.isResetPasswordOnLogin()) {
+            user.setResetPasswordOnLogin(false);
+            user.setPassword(new BCryptPasswordEncoder().encode(body.getPassword()));
+            userRepo.save(user);
+        }
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 
@@ -237,6 +261,36 @@ public class UserController {
             this.idea1 = idea1;
             this.idea2 = idea2;
             this.idea3 = idea3;
+        }
+
+    }
+
+    @Getter @Setter
+    private static class ResetPasswordRequest {
+
+        public String email;
+        public boolean resetPassword;
+
+        public ResetPasswordRequest() {}
+
+        public ResetPasswordRequest(String email, boolean resetPassword) {
+            this.email = email;
+            this.resetPassword = resetPassword;
+        }
+
+    }
+
+    @Getter @Setter
+    private static class SetPasswordRequest {
+
+        public String email;
+        public String password;
+
+        public SetPasswordRequest() {}
+
+        public SetPasswordRequest(String email, String password) {
+            this.email = email;
+            this.password = password;
         }
 
     }
