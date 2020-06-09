@@ -70,6 +70,11 @@ public class UserController {
         return ResponseEntity.ok().body(user);
     }
 
+    @GetMapping("/professorAvatar")
+    public ResponseEntity<String> getProfessorAvatar(HttpServletRequest request) {
+        return ResponseEntity.ok().body(userRepo.findByEmailIgnoreCase("admin@usc.edu").getAvatarSVG());
+    }
+
     @GetMapping("/allUsers")
     public ResponseEntity<?> getAllUsers(HttpServletRequest request) {
         if (!userService.isProf(request)) {

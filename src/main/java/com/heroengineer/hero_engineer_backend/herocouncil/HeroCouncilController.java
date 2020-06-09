@@ -29,6 +29,7 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -91,6 +92,8 @@ public class HeroCouncilController {
     public ResponseEntity<?> save(HttpServletRequest request, @RequestBody @Valid HeroCouncil council) {
         String userEmail = jwtTokenUtil.getUsernameFromRequest(request);
 
+        if (council.getAnnouncements() == null) council.setAnnouncements(new ArrayList<>());
+
         if (council.getId() == null || council.getId().isBlank()) {
             // Creating new Hero Council -- find ID from Hero Council created from file upload
             for (HeroCouncil otherCouncil : repo.findAll()) {
@@ -112,6 +115,7 @@ public class HeroCouncilController {
                         if (council.getDeclarationFileName() == null || council.getDeclarationFileName().isBlank()) {
                             council.setDeclarationFileName(otherCouncil.getDeclarationFileName());
                         }
+                        council.setAnnouncements(otherCouncil.getAnnouncements());
                         Collections.sort(otherCouncil.getEmails());
                         Collections.sort(council.getEmails());
                         if (!otherCouncil.getEmails().equals(council.getEmails())) {
@@ -199,7 +203,6 @@ public class HeroCouncilController {
     @PostMapping(value = "/uploadDeclaration", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> uploadHeroCouncilDeclaration(HttpServletRequest request, @RequestParam MultipartFile file) throws IOException {
         String userEmail = jwtTokenUtil.getUsernameFromRequest(request);
-        User user = userRepo.findByEmailIgnoreCase(userEmail);
 
         // Make a new Hero Council for the file if the user doesn't already have a council
         HeroCouncil council = null;

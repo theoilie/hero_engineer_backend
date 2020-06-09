@@ -21,6 +21,8 @@ public class HeroCouncil {
     public boolean approved; // Whether or not the professor has approved this Hero Council
     @Getter @Setter
     public String declarationFileName;
+    @Getter @Setter
+    public List<Announcement> announcements;
 
     public HeroCouncil() {}
 
@@ -43,6 +45,21 @@ public class HeroCouncil {
     public String toString() {
         return String.format("HeroCouncil[id=%s, name=%s, emails=%s, approved=%s, declarationFileName=%s]",
                 id, name, String.join(",", emails), approved, declarationFileName);
+    }
+
+    @Getter @Setter
+    public static class Announcement {
+
+        public int num; // Used for ordering -- to display announcements in ascending order on frontend
+        public String text;
+
+        public Announcement() {}
+
+        public Announcement(int num, String text) {
+            this.num = num;
+            this.text = text;
+        }
+
     }
 
 }

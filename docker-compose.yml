@@ -16,6 +16,8 @@ services:
     build: .
     ports:
       - 8081:8081
+    volumes:
+      - ~/hero_engineer_data/uploads:/uploads
     container_name: hero_engineer_backend_container
     depends_on:
       - hero_engineer_mongo
