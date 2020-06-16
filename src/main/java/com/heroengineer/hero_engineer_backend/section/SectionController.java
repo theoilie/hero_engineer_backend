@@ -70,8 +70,12 @@ public class SectionController {
             if (section.getEmails().contains(email.toLowerCase())) {
                 List<User> classmates = new ArrayList<>();
                 for (String classmateEmail : section.getEmails()) {
-                    if (classmateEmail.equals(email)) continue;
+                    if (classmateEmail.equalsIgnoreCase(email)) continue;
                     User classmate = userRepo.findByEmailIgnoreCase(classmateEmail);
+                    if (classmate == null) {
+                        System.out.println("ERROR: Email " + classmateEmail + " is in section " + section.getName() + " but does not exist!");
+                        continue;
+                    }
                     classmate.setQuests(new ArrayList<>());
                     classmate.setPassword("");
                     classmates.add(classmate);
