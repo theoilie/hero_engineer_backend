@@ -88,7 +88,6 @@ public class JwtAuthenticationRestController {
 
   @ExceptionHandler({ AuthenticationException.class })
   public ResponseEntity<String> handleAuthenticationException(AuthenticationException e) {
-    System.out.println("reached authentication exception");
     e.printStackTrace();
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
   }

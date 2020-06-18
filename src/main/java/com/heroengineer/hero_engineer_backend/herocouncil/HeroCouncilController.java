@@ -94,43 +94,36 @@ public class HeroCouncilController {
 
         if (council.getAnnouncements() == null) council.setAnnouncements(new ArrayList<>());
 
-        if (council.getId() == null || council.getId().isBlank()) {
-            // Creating new Hero Council -- find ID from Hero Council created from file upload
-            for (HeroCouncil otherCouncil : repo.findAll()) {
-                if (otherCouncil.getEmails().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
-                    System.out.println("found matching ID");
-                    council.setId(otherCouncil.getId());
-                    break;
-                }
+        if (userService.isProf(request)) {
+            if (council.getId() != null && !council.getId().isBlank()) {
+                // Save pre-existing council
+                repo.save(council);
+            } else {
+                // No ID given -- find pre-existing council and update it
+                updateCouncil(council, userEmail);
             }
         } else {
-            // Make sure the user is actually in the Hero Council that he/she is saving, and only allow changing the name
-            if (!userService.isProf(request)) {
-                for (HeroCouncil otherCouncil : repo.findAll()) {
-                    if (otherCouncil.getId().equals(council.getId())) {
-                        if (otherCouncil.getEmails().size() != council.getEmails().size() ||
-                                otherCouncil.isApproved() != council.isApproved()) {
-                            return ResponseEntity.badRequest().body(null);
-                        }
-                        if (council.getDeclarationFileName() == null || council.getDeclarationFileName().isBlank()) {
-                            council.setDeclarationFileName(otherCouncil.getDeclarationFileName());
-                        }
-                        council.setAnnouncements(otherCouncil.getAnnouncements());
-                        Collections.sort(otherCouncil.getEmails());
-                        Collections.sort(council.getEmails());
-                        if (!otherCouncil.getEmails().equals(council.getEmails())) {
-                            return ResponseEntity.badRequest().body(null);
-                        }
-                        continue;
-                    }
-                    if (otherCouncil.getEmails().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
-                        return ResponseEntity.badRequest().body(null);
-                    }
-                }
+            // The only time a student (not professor) can save is when they're creating a new council
+            if (council.getId() != null && !council.getId().isBlank()) {
+                return ResponseEntity.badRequest().body(null);
+            }
+            updateCouncil(council, userEmail);
+        }
+
+        return ResponseEntity.ok().body(null);
+    }
+
+    private void updateCouncil(HeroCouncil council, String userEmail) {
+        for (HeroCouncil otherCouncil : repo.findAll()) {
+            // Make sure the student is in the council that he/she is creating
+            // Find the ID from the Hero Council that was created from file/Declaration upload
+            if (otherCouncil.getEmails().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
+                council.setId(otherCouncil.getId());
+                council.setDeclarationFileName(otherCouncil.getDeclarationFileName());
+                repo.save(council);
+                break;
             }
         }
-        repo.save(council);
-        return ResponseEntity.ok().body(null);
     }
 
     @DeleteMapping("/remove/{id}")
@@ -207,7 +200,7 @@ public class HeroCouncilController {
         // Make a new Hero Council for the file if the user doesn't already have a council
         HeroCouncil council = null;
         for (HeroCouncil otherCouncil : repo.findAll()) {
-            if (otherCouncil.getEmails().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
+            if (otherCouncil.getEmails().stream().anyMatch(email -> email != null && email.equalsIgnoreCase(userEmail))) {
                 council = otherCouncil;
                 break;
             }
@@ -215,11 +208,14 @@ public class HeroCouncilController {
         if (council == null) {
             council = new HeroCouncil("", Collections.singletonList(userEmail.toLowerCase()), false, "");
         }
-        repo.save(council);
+        council = repo.save(council);
 
         String fileName = fileStorageService.storeFile(council.getId(), file);
+        System.out.println("filename: " + fileName);
         council.setDeclarationFileName(fileName);
-        repo.save(council);
+        System.out.println("council's set fileName: " + council.getDeclarationFileName());
+        council = repo.save(council);
+        System.out.println("council's set fileName after saving: " + council.getDeclarationFileName());
         return ResponseEntity.ok().build();
     }
 
