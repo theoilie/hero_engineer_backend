@@ -173,9 +173,12 @@ public class QuestController {
         if (!individualCode.equals(code.getCode()) && !universalCode.equals(code.getCode())) {
             return ResponseEntity.ok().body("{\"error\": \"Invalid code.\"}");
         }
+        if (userQuest.isComplete()) {
+            return ResponseEntity.ok().body("{\"error\": \"You have already completed this quest.\"}");
+        }
 
         if ((!globalQuest.isCompleteWithQuizzesAndCode() && globalQuest.isCompleteWithCode())
-                || userQuest.getIncompleteQuizIds().isEmpty() && !userQuest.isComplete()) {
+                || userQuest.getIncompleteQuizIds().isEmpty()) {
             userQuest.setComplete(true);
             if (userQuest.getIncompleteQuizIds().isEmpty() && !userQuest.getCompletedQuizzes().isEmpty()) {
                 quizService.awardXP(user, userQuest);
