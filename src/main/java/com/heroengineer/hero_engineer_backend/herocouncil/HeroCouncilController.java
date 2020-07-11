@@ -117,13 +117,16 @@ public class HeroCouncilController {
         for (HeroCouncil otherCouncil : repo.findAll()) {
             // Make sure the student is in the council that he/she is creating
             // Find the ID from the Hero Council that was created from file/Declaration upload
-            if (otherCouncil.getEmails().stream().anyMatch(email -> email.equalsIgnoreCase(userEmail))) {
+            if (otherCouncil.getEmails().stream().anyMatch(email -> email != null && email.equalsIgnoreCase(userEmail))) {
                 council.setId(otherCouncil.getId());
                 council.setDeclarationFileName(otherCouncil.getDeclarationFileName());
                 repo.save(council);
                 break;
             }
         }
+
+        // Doesn't match any other council -- make a new council
+        repo.save(council);
     }
 
     @DeleteMapping("/remove/{id}")
@@ -211,11 +214,8 @@ public class HeroCouncilController {
         council = repo.save(council);
 
         String fileName = fileStorageService.storeFile(council.getId(), file);
-        System.out.println("filename: " + fileName);
         council.setDeclarationFileName(fileName);
-        System.out.println("council's set fileName: " + council.getDeclarationFileName());
-        council = repo.save(council);
-        System.out.println("council's set fileName after saving: " + council.getDeclarationFileName());
+        repo.save(council);
         return ResponseEntity.ok().build();
     }
 
@@ -233,7 +233,6 @@ public class HeroCouncilController {
         try {
             contentType = request.getServletContext().getMimeType(resource.getFile().getAbsolutePath());
         } catch (IOException ex) {
-            System.out.println("Could not determine file type.");
             ex.printStackTrace();
         }
 

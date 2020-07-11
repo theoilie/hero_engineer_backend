@@ -175,7 +175,7 @@ public class QuestController {
         }
 
         if ((!globalQuest.isCompleteWithQuizzesAndCode() && globalQuest.isCompleteWithCode())
-                || userQuest.getIncompleteQuizIds().isEmpty()) {
+                || userQuest.getIncompleteQuizIds().isEmpty() && !userQuest.isComplete()) {
             userQuest.setComplete(true);
             if (userQuest.getIncompleteQuizIds().isEmpty() && !userQuest.getCompletedQuizzes().isEmpty()) {
                 quizService.awardXP(user, userQuest);
