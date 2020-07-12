@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -216,6 +218,51 @@ public class UserController {
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 
+    @PostMapping("/addXP")
+    public ResponseEntity<String> addXP(HttpServletRequest request, @Valid @RequestBody AddXPRequest body) {
+        if (!userService.isProf(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
+        }
+
+        User user = userRepo.findByEmailIgnoreCase(body.getEmail());
+        user.setXp(user.getXp() + body.getXp());
+        userRepo.save(user);
+        return ResponseEntity.ok().body("{\"error\": \"\"}");
+    }
+
+    @GetMapping("/XPBreakdown/{email}")
+    public ResponseEntity<?> getXPBreakdown(HttpServletRequest request, @PathVariable String email) {
+        if (!userService.isProf(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
+        }
+
+        User user = userRepo.findByEmailIgnoreCase(email);
+        int totalXP = 0;
+        Map<String, Integer> breakdown = new HashMap<>();
+        for (Quest quest : user.getQuests()) {
+            if (quest.isComplete()) {
+                int xpGained = 0;
+                if (quest.getIncompleteQuizIds().isEmpty() && !quest.getCompletedQuizzes().isEmpty()) {
+                    double totalPercentCorrect = 0;
+                    for (GradedQuiz otherGradedQuiz : quest.getCompletedQuizzes()) {
+                        totalPercentCorrect += otherGradedQuiz.getGradePercent();
+                    }
+                    double avgPercentCorrect = totalPercentCorrect / quest.getCompletedQuizzes().size();
+                    xpGained = (int) (avgPercentCorrect * quest.getAutomaticXpReward());
+                } else {
+                   xpGained = quest.getAutomaticXpReward();
+                }
+
+                breakdown.put(quest.getName(), xpGained);
+                totalXP += xpGained;
+            }
+        }
+
+        breakdown.put("Total", totalXP);
+
+        return ResponseEntity.ok().body(breakdown);
+    }
+
     private static class ChangeWhitelistRequest {
 
         @Getter @Setter
@@ -291,6 +338,22 @@ public class UserController {
         public SetPasswordRequest(String email, String password) {
             this.email = email;
             this.password = password;
+        }
+
+    }
+
+    @Getter @Setter
+    private static class AddXPRequest {
+
+        public String email;
+        public int xp;
+        // TODO: Add a reason option for tracking totals
+
+        public AddXPRequest() {}
+
+        public AddXPRequest(String email, int xp) {
+            this.email = email;
+            this.xp = xp;
         }
 
     }
