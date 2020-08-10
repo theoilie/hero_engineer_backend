@@ -1,9 +1,11 @@
 package com.heroengineer.hero_engineer_backend.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.heroengineer.hero_engineer_backend.assignment.GradedShortAnswerAssignment;
 import com.heroengineer.hero_engineer_backend.quest.Quest;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -17,54 +19,37 @@ import java.util.List;
 /**
  * MongoDB representation of a student.
  */
+@NoArgsConstructor
+@ToString
+@Data
 public class User implements UserDetails {
 
-    @Id @Getter @JsonIgnore
+    @Id @JsonIgnore
     public String id;
     // TODO: Improve the regular expression
-    @Getter @Setter
     @Email(regexp="[^@]+@usc.edu", message="USC email is not valid")
     public String email;
-    @Getter @Setter
     public String username;
-    @Getter @Setter
     public String password;
-    @Getter @Setter
     public String heroId;
-    @Getter @Setter
     public String avatarSVG;
-    @Getter @Setter
     public AvatarDataMale avatarDataMale;
-    @Getter @Setter
     public AvatarDataFemale avatarDataFemale;
-    @Getter @Setter
     public AvatarDataColors avatarDataColors;
-    @Getter @Setter
     public int xp;
-    @Getter @Setter
     public int points;
-    @Getter @Setter
     public List<Quest> quests;
-    @Getter @Setter
+    public List<GradedShortAnswerAssignment> gradedShortAnswerAssignments;
     public String grandChallengeCategory;
-    @Getter @Setter
     public String grandChallengeCode;
-    @Getter @Setter
     public String idea1;
-    @Getter @Setter
     public String idea2;
-    @Getter @Setter
     public String idea3;
-    @Getter @Setter
     public boolean isProf;
-    @Getter @Setter
     public boolean resetPasswordOnLogin;
-    @Getter @Setter
     public String role;
 
     private Collection<? extends GrantedAuthority> authorities;
-
-    public User() {}
 
     public User(String email,
                 String username,
@@ -77,6 +62,7 @@ public class User implements UserDetails {
                 int xp,
                 int points,
                 List<Quest> quests,
+                List<GradedShortAnswerAssignment> gradedShortAnswerAssignments,
                 String grandChallengeCategory,
                 String grandChallengeCode,
                 String idea1,
@@ -96,6 +82,7 @@ public class User implements UserDetails {
                 xp,
                 points,
                 quests,
+                gradedShortAnswerAssignments,
                 grandChallengeCategory,
                 grandChallengeCode,
                 idea1,
@@ -118,6 +105,7 @@ public class User implements UserDetails {
                 int xp,
                 int points,
                 List<Quest> quests,
+                List<GradedShortAnswerAssignment> gradedShortAnswerAssignments,
                 String grandChallengeCategory,
                 String grandChallengeCode,
                 String idea1,
@@ -137,6 +125,7 @@ public class User implements UserDetails {
         this.xp = xp;
         this.points = points;
         this.quests = quests;
+        this.gradedShortAnswerAssignments = gradedShortAnswerAssignments;
         this.grandChallengeCategory = grandChallengeCategory;
         this.grandChallengeCode = grandChallengeCode;
         this.idea1 = idea1;

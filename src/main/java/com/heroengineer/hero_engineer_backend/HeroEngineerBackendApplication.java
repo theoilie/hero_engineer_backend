@@ -81,6 +81,7 @@ public class HeroEngineerBackendApplication {
                     0,
                     0,
                     new ArrayList<>(),
+                    new ArrayList<>(),
                     "",
                     "",
                     "",
@@ -256,6 +257,7 @@ public class HeroEngineerBackendApplication {
                     50,
                     true,
                     false,
+                    false,
                     true,
                     false,
                     false,
@@ -267,9 +269,11 @@ public class HeroEngineerBackendApplication {
             );
             questService.saveQuest(quest1);
             questService.saveQuest(new Quest(
+                    new ObjectIdGenerator().generate().toString(),
                     "Randy Pausch Deeper Dive",
                     "To optionally further improve your skills from the initial \"Randy Pausch Review\" main quest, accept this quest. Your Hero will test their ability in further exploring the roles of entertainment and social skills as heroic traits.",
                     5,
+                    false,
                     false,
                     false,
                     true,

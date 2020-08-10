@@ -33,6 +33,7 @@ public class QuestService {
                         userQuest.setDescription(quest.getDescription());
                         userQuest.setAutomaticXpReward(quest.getAutomaticXpReward());
                         userQuest.setMain(quest.isMain());
+                        userQuest.setAvailable(quest.isAvailable());
                         userQuest.setCompleteWithQuizzes(quest.isCompleteWithQuizzes());
                         userQuest.setCompleteWithCode(quest.isCompleteWithCode());
                         userQuest.setCompleteWithQuizzesAndCode(quest.isCompleteWithQuizzesAndCode());
