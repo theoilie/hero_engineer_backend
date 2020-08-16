@@ -1,5 +1,6 @@
 package com.heroengineer.hero_engineer_backend.user;
 
+import com.heroengineer.hero_engineer_backend.assignment.GradedShortAnswerAssignment;
 import com.heroengineer.hero_engineer_backend.jwt.JwtTokenUtil;
 import com.heroengineer.hero_engineer_backend.quest.Quest;
 import com.heroengineer.hero_engineer_backend.quest.QuestRepository;
@@ -253,8 +254,16 @@ public class UserController {
                    xpGained = quest.getAutomaticXpReward();
                 }
 
-                breakdown.put(quest.getName(), xpGained);
-                totalXP += xpGained;
+                if (xpGained != 0) {
+                    breakdown.put(quest.getName(), xpGained);
+                    totalXP += xpGained;
+                }
+            }
+        }
+        for (GradedShortAnswerAssignment gradedAssignment : user.getGradedShortAnswerAssignments()) {
+            if (gradedAssignment.getXpAwarded() != 0) {
+                breakdown.put(gradedAssignment.getName(), gradedAssignment.getXpAwarded());
+                totalXP += gradedAssignment.getXpAwarded();
             }
         }
 

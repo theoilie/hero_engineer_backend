@@ -1,12 +1,13 @@
 package com.heroengineer.hero_engineer_backend.assignment;
 
 import com.heroengineer.hero_engineer_backend.jwt.JwtTokenUtil;
-import com.heroengineer.hero_engineer_backend.quiz.GradeQuizRequest;
 import com.heroengineer.hero_engineer_backend.section.Section;
 import com.heroengineer.hero_engineer_backend.section.SectionRepository;
 import com.heroengineer.hero_engineer_backend.user.User;
 import com.heroengineer.hero_engineer_backend.user.UserRepository;
 import com.heroengineer.hero_engineer_backend.user.UserService;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 import org.bson.codecs.ObjectIdGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -127,21 +128,37 @@ public class ShortAnswerAssignmentController {
     }
 
     @PostMapping("/saveGraded")
-    public ResponseEntity<String> saveGradedAssignment(HttpServletRequest request, @RequestBody GradedShortAnswerAssignment gradedAssignment) {
+    public ResponseEntity<String> saveGradedAssignment(HttpServletRequest request, @RequestBody GradedShortAnswerAssignmentRequest gradedAssignmentRequest) {
         String email = jwtTokenUtil.getUsernameFromRequest(request);
 
         if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"JWT not accepted\"}");
         }
 
+        GradedShortAnswerAssignment gradedAssignment = gradedAssignmentRequest.getGradedAssignment();
+        boolean isProf = userService.isProf(request);
+
         // Find a matching ungraded assignment template and verify that the data the student is sending matches
-        if (!userService.isProf(request)) {
+        if (!isProf) {
             boolean matchedAssignment = false;
             for (ShortAnswerAssignment assignment : repo.findAll()) {
                 if (assignment.getId().equals(gradedAssignment.getId())) {
                     matchedAssignment = true;
                     gradedAssignment.setMaxXp(assignment.getMaxXp());
                     gradedAssignment.setXpAwarded(0);
+                    gradedAssignment.setAvailable(assignment.getSectionIdsAvailableFor().contains(
+                            sectionRepo.findAll()
+                                    .stream()
+                                    .filter(section -> section.getEmails().contains(email.toLowerCase()))
+                                    .findFirst()
+                                    .orElse(new Section("", "", new ArrayList<>()))
+                                    .getId()));
+                    for (Section section : sectionRepo.findAll()) {
+                        if (section.getEmails().contains(email.toLowerCase()) && assignment.getSectionIdsAvailableFor().contains(section.getId())) {
+                            gradedAssignment.setAvailable(true);
+                            break;
+                        }
+                    }
                     break;
                 }
             }
@@ -151,23 +168,39 @@ public class ShortAnswerAssignmentController {
         }
 
         for (User user : userRepo.findAll()) {
-            if (user == null) continue;
+            if (user == null || !user.getEmail().equalsIgnoreCase(isProf ? gradedAssignmentRequest.getEmail() : email)) continue;
             if (user.getGradedShortAnswerAssignments() == null) user.setGradedShortAnswerAssignments(new ArrayList<>());
 
-            // Check if the student already submitted this assignment
-            if (!userService.isProf(request)) {
-                for (GradedShortAnswerAssignment otherGradedAssignment : user.getGradedShortAnswerAssignments()) {
-                    if (otherGradedAssignment.getId().equals(gradedAssignment.getId())) {
+            // Remove the old assignment object from the student's data before adding the updated assignment object
+            List<GradedShortAnswerAssignment> updatedGradedAssignments = new ArrayList<>(user.getGradedShortAnswerAssignments());
+            for (GradedShortAnswerAssignment otherGradedAssignment : user.getGradedShortAnswerAssignments()) {
+                if (otherGradedAssignment.getId().equals(gradedAssignment.getId())) {
+                    if (userService.isProf(request)) {
+                        // Grade the assignment if the professor sent this request
+                        updatedGradedAssignments.remove(otherGradedAssignment);
+                        user.setXp(user.getXp() + (gradedAssignment.getXpAwarded() - otherGradedAssignment.getXpAwarded()));
+                        break;
+                    } else {
+                        // Don't allow a student to submit their assignment more than once
                         return ResponseEntity.badRequest().body("{\"error\": \"ASSIGNMENT_ALREADY_GRADED\"}");
                     }
                 }
             }
 
-            user.getGradedShortAnswerAssignments().add(gradedAssignment);
+            updatedGradedAssignments.add(gradedAssignment);
+            user.setGradedShortAnswerAssignments(updatedGradedAssignments);
             userRepo.save(user);
+            break;
         }
 
         return ResponseEntity.ok().body("{\"error\": \"\"}");
+    }
+
+    @Data
+    @RequiredArgsConstructor
+    static class GradedShortAnswerAssignmentRequest {
+        final GradedShortAnswerAssignment gradedAssignment;
+        final String email;
     }
 
 }
