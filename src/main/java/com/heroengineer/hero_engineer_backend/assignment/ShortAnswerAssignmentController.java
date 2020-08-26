@@ -164,15 +164,9 @@ public class ShortAnswerAssignmentController {
                     matchedAssignment = true;
                     gradedAssignment.setMaxXp(assignment.getMaxXp());
                     gradedAssignment.setXpAwarded(0);
-                    gradedAssignment.setAvailable(assignment.getSectionIdsAvailableFor().contains(
-                            sectionRepo.findAll()
-                                    .stream()
-                                    .filter(section -> section.getEmails().contains(email.toLowerCase()))
-                                    .findFirst()
-                                    .orElse(new Section("", "", new ArrayList<>()))
-                                    .getId()));
+                    gradedAssignment.setAvailable(false);
                     for (Section section : sectionRepo.findAll()) {
-                        if (section.getEmails().contains(email.toLowerCase()) && assignment.getSectionIdsAvailableFor().contains(section.getId())) {
+                        if (section.getEmails().contains(email.toLowerCase()) && assignment.getSectionIdsGradesAvailableFor().contains(section.getId())) {
                             gradedAssignment.setAvailable(true);
                             break;
                         }
@@ -193,7 +187,7 @@ public class ShortAnswerAssignmentController {
             List<GradedShortAnswerAssignment> updatedGradedAssignments = new ArrayList<>(user.getGradedShortAnswerAssignments());
             for (GradedShortAnswerAssignment otherGradedAssignment : user.getGradedShortAnswerAssignments()) {
                 if (otherGradedAssignment.getId().equals(gradedAssignment.getId())) {
-                    if (userService.isProf(request)) {
+                    if (isProf) {
                         // Grade the assignment if the professor sent this request
                         updatedGradedAssignments.remove(otherGradedAssignment);
                         user.setXp(user.getXp() + (gradedAssignment.getXpAwarded() - otherGradedAssignment.getXpAwarded()));
