@@ -19,6 +19,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * REST controller for in-class, short-answer assignments.
@@ -85,6 +86,7 @@ public class ShortAnswerAssignmentController {
 
         // Avoid NPEs
         if (assignment.getSectionIdsAvailableFor() == null) assignment.setSectionIdsAvailableFor(new ArrayList<>());
+        if (assignment.getSectionIdsGradesAvailableFor() == null) assignment.setSectionIdsGradesAvailableFor(new ArrayList<>());
         if (assignment.getQuestions() == null) assignment.setQuestions(new ArrayList<>());
         for (ShortAnswerQuestion question : assignment.getQuestions()) {
             if (question.getId() == null) question.setId(new ObjectIdGenerator().generate().toString());
@@ -99,7 +101,7 @@ public class ShortAnswerAssignmentController {
                 if (gradedAssignment.getId().equals(assignment.getId())) {
                     for (Section section : sectionRepo.findAll()) {
                         if (section.getEmails().contains(user.getEmail().toLowerCase())) {
-                            boolean available = assignment.getSectionIdsAvailableFor().contains(section.getId());
+                            boolean available = assignment.getSectionIdsGradesAvailableFor().contains(section.getId());
                             if (gradedAssignment.isAvailable() != available) {
                                 gradedAssignment.setAvailable(available);
                                 changed = true;
@@ -124,6 +126,22 @@ public class ShortAnswerAssignmentController {
         }
 
         repo.deleteById(id);
+
+        // Update graded assignments on user objects in Mongo to make sure they're in sync with the saved data
+        for (User user : userRepo.findAll()) {
+            if (user == null || user.getGradedShortAnswerAssignments() == null) continue;
+
+            boolean changed = false;
+            List<GradedShortAnswerAssignment> gradedAssignments = user.getGradedShortAnswerAssignments()
+                    .stream()
+                    .filter(gradedAssignment -> !gradedAssignment.getId().equals(id))
+                    .collect(Collectors.toList());
+            if (gradedAssignments.size() < user.getGradedShortAnswerAssignments().size()) {
+                user.setGradedShortAnswerAssignments(gradedAssignments);
+                userRepo.save(user);
+            }
+        }
+
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 

@@ -29,6 +29,8 @@ public class ShortAnswerAssignment {
     @Getter @Setter
     public List<String> sectionIdsAvailableFor; // List of ids of class sections for which students can view questions and submit answers
     @Getter @Setter
+    public List<String> sectionIdsGradesAvailableFor; // List of ids of class sections for which students can view this assignment if it's graded
+    @Getter @Setter
     public int maxXp;
 
 }
