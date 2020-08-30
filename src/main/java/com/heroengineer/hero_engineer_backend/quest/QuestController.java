@@ -6,6 +6,7 @@ import com.heroengineer.hero_engineer_backend.user.User;
 import com.heroengineer.hero_engineer_backend.user.UserRepository;
 import com.heroengineer.hero_engineer_backend.user.UserService;
 import com.heroengineer.hero_engineer_backend.util.UtilService;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -197,8 +198,7 @@ public class QuestController {
     }
 
     @Data
-    @RequiredArgsConstructor
-    @NoArgsConstructor
+    @AllArgsConstructor
     private static class GenerateCodeRequest {
 
         public String userEmail;
@@ -207,8 +207,7 @@ public class QuestController {
     }
 
     @Data
-    @RequiredArgsConstructor
-    @NoArgsConstructor
+    @AllArgsConstructor
     private static class GenerateUniversalCodeRequest {
 
         public String questId;
@@ -216,8 +215,7 @@ public class QuestController {
     }
 
     @Data
-    @RequiredArgsConstructor
-    @NoArgsConstructor
+    @AllArgsConstructor
     private static class EnterCodeRequest {
 
         public String questId;
