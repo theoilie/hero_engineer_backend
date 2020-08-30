@@ -6,8 +6,9 @@ import com.heroengineer.hero_engineer_backend.user.User;
 import com.heroengineer.hero_engineer_backend.user.UserRepository;
 import com.heroengineer.hero_engineer_backend.user.UserService;
 import com.heroengineer.hero_engineer_backend.util.UtilService;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -164,7 +165,7 @@ public class QuestController {
         if (userQuest == null || globalQuest == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"No user quest matches the ID given\"}");
         }
-        String individualCode = (globalQuest.getCode() == null || globalQuest.getCode().isEmpty()) ? "" : globalQuest.getCode();
+        String individualCode = (userQuest.getCode() == null || userQuest.getCode().isEmpty()) ? "" : userQuest.getCode();
         String universalCode = (globalQuest.getUniversalCode() == null || globalQuest.getUniversalCode().isEmpty()) ? "" : globalQuest.getUniversalCode();
         if ((!globalQuest.isCompleteWithCode() && !globalQuest.isCompleteWithQuizzesAndCode()) ||
                 (individualCode.isEmpty() && universalCode.isEmpty())) {
@@ -172,6 +173,9 @@ public class QuestController {
         }
         if (!individualCode.equals(code.getCode()) && !universalCode.equals(code.getCode())) {
             return ResponseEntity.ok().body("{\"error\": \"Invalid code.\"}");
+        }
+        if (userQuest.isCodeEnteredSuccessfully()) {
+            return ResponseEntity.ok().body("{\"error\": \"You have already successfully entered your code for this quest.\"}");
         }
         if (userQuest.isComplete()) {
             return ResponseEntity.ok().body("{\"error\": \"You have already completed this quest.\"}");
@@ -183,56 +187,41 @@ public class QuestController {
             if (userQuest.getIncompleteQuizIds().isEmpty() && !userQuest.getCompletedQuizzes().isEmpty()) {
                 quizService.awardXP(user, userQuest);
             } else {
-                user.setXp(user.getXp() + userQuest.getAutomaticXpReward());
+                user.addXp(globalQuest.getAutomaticXpReward(), "Completed quest (with no quizzes): " + globalQuest.getName());
             }
-            userRepo.save(user);
         }
 
+        userQuest.setCodeEnteredSuccessfully(true);
+        userRepo.save(user);
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 
+    @Data
+    @RequiredArgsConstructor
+    @NoArgsConstructor
     private static class GenerateCodeRequest {
 
-        @Getter @Setter
         public String userEmail;
-        @Getter @Setter
         public String questId;
-
-        public GenerateCodeRequest() {}
-
-        public GenerateCodeRequest(String userEmail, String questId) {
-            this.userEmail = userEmail;
-            this.questId = questId;
-        }
 
     }
 
+    @Data
+    @RequiredArgsConstructor
+    @NoArgsConstructor
     private static class GenerateUniversalCodeRequest {
 
-        @Getter @Setter
         public String questId;
-
-        public GenerateUniversalCodeRequest() {}
-
-        public GenerateUniversalCodeRequest(String questId) {
-            this.questId = questId;
-        }
 
     }
 
+    @Data
+    @RequiredArgsConstructor
+    @NoArgsConstructor
     private static class EnterCodeRequest {
 
-        @Getter @Setter
         public String questId;
-        @Getter @Setter
         public String code;
-
-        public EnterCodeRequest() {}
-
-        public EnterCodeRequest(String questId, String code) {
-            this.questId = questId;
-            this.code = code;
-        }
 
     }
 

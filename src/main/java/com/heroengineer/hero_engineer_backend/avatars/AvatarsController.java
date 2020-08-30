@@ -25,9 +25,7 @@ public class AvatarsController {
 
     @GetMapping(value="/json/svgavatars-male-data", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getMaleData() {
-        String data = getJson("avatars/svgavatars-male-data.json");
-        System.out.println(data);
-        return data;
+        return getJson("avatars/svgavatars-male-data.json");
     }
 
     @GetMapping(value="/json/svgavatars-female-data", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -175,7 +175,7 @@ public class QuizController {
             gradedQuestions.add(gradedQuestion);
         }
 
-        double percentCorrect = points / (maxPoints * 1D);
+        double percentCorrect = points == 0 ? 0 : points / (maxPoints * 1D);
         GradedQuiz gradedQuiz = new GradedQuiz(
                 globalQuiz.getId(),
                 globalQuiz.getName(),
@@ -186,14 +186,11 @@ public class QuizController {
         quest.getCompletedQuizzes().add(gradedQuiz);
 
         quest.getIncompleteQuizIds().remove(globalQuiz.getId());
-        if (quest.getIncompleteQuizIds().isEmpty()) {
+        if (quest.getIncompleteQuizIds().isEmpty()
+                && (quest.isCompleteWithQuizzes() || (quest.isCompleteWithQuizzesAndCode() && quest.isCodeEnteredSuccessfully()))) {
             // Award XP if this was the last quiz the user needed to complete for this quest
             quizService.awardXP(user, quest);
-
-            // Complete the quest if this was the last quiz and completeWithQuizzes is true
-            if (quest.isCompleteWithQuizzes() && !quest.isCompleteWithQuizzesAndCode()) {
-                quest.setComplete(true);
-            }
+            quest.setComplete(true);
         }
 
         userRepo.save(user);

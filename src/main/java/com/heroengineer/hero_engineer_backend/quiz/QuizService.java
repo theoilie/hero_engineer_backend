@@ -78,7 +78,8 @@ public class QuizService {
             totalPercentCorrect += otherGradedQuiz.getGradePercent();
         }
         double avgPercentCorrect = totalPercentCorrect / quest.getCompletedQuizzes().size();
-        user.setXp(user.getXp() + (int) (avgPercentCorrect * quest.getAutomaticXpReward()));
+        user.addXp((int) (avgPercentCorrect * quest.getAutomaticXpReward()),
+                "Completed quest (with " + (totalPercentCorrect * 100) + "% quiz score): " + quest.getName());
     }
 
 }

@@ -5,8 +5,9 @@ import com.heroengineer.hero_engineer_backend.jwt.JwtTokenUtil;
 import com.heroengineer.hero_engineer_backend.quest.Quest;
 import com.heroengineer.hero_engineer_backend.quest.QuestRepository;
 import com.heroengineer.hero_engineer_backend.quiz.GradedQuiz;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -226,7 +227,8 @@ public class UserController {
         }
 
         User user = userRepo.findByEmailIgnoreCase(body.getEmail());
-        user.setXp(user.getXp() + body.getXp());
+        user.addXp(body.getXp(), body.getReason());
+
         userRepo.save(user);
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
@@ -238,6 +240,12 @@ public class UserController {
         }
 
         User user = userRepo.findByEmailIgnoreCase(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"No user was found for the email provided.\"}");
+        }
+        if (user.getQuests() == null) user.setQuests(new ArrayList<>());
+        if (user.getGradedShortAnswerAssignments() == null) user.setGradedShortAnswerAssignments(new ArrayList<>());
+
         int totalXP = 0;
         Map<String, Integer> breakdown = new HashMap<>();
         for (Quest quest : user.getQuests()) {
@@ -262,7 +270,7 @@ public class UserController {
         }
         for (GradedShortAnswerAssignment gradedAssignment : user.getGradedShortAnswerAssignments()) {
             if (gradedAssignment.getXpAwarded() != 0) {
-                breakdown.put(gradedAssignment.getName(), gradedAssignment.getXpAwarded());
+                breakdown.put("[In-Class Assignment] " + gradedAssignment.getName(), gradedAssignment.getXpAwarded());
                 totalXP += gradedAssignment.getXpAwarded();
             }
         }
@@ -272,20 +280,18 @@ public class UserController {
         return ResponseEntity.ok().body(breakdown);
     }
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class ChangeWhitelistRequest {
 
-        @Getter @Setter
         public String email;
-
-        public ChangeWhitelistRequest() {}
-
-        public ChangeWhitelistRequest(String email) {
-            this.email = email;
-        }
 
     }
 
-    @Getter @Setter
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class UpdateAvatarRequest {
 
         public String avatarSVG;
@@ -293,77 +299,47 @@ public class UserController {
         public AvatarDataFemale avatarDataFemale;
         public AvatarDataColors avatarDataColors;
 
-        public UpdateAvatarRequest() {}
-
-        public UpdateAvatarRequest(String avatarSVG, AvatarDataMale avatarDataMale, AvatarDataFemale avatarDataFemale, AvatarDataColors avatarDataColors) {
-            this.avatarSVG = avatarSVG;
-            this.avatarDataMale = avatarDataMale;
-            this.avatarDataFemale = avatarDataFemale;
-            this.avatarDataColors = avatarDataColors;
-        }
-
     }
 
-    @Getter @Setter
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class SetIdeasRequest {
 
         public String idea1;
         public String idea2;
         public String idea3;
 
-        public SetIdeasRequest() {}
-
-        public SetIdeasRequest(String idea1, String idea2, String idea3) {
-            this.idea1 = idea1;
-            this.idea2 = idea2;
-            this.idea3 = idea3;
-        }
-
     }
 
-    @Getter @Setter
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class ResetPasswordRequest {
 
         public String email;
         public boolean resetPassword;
 
-        public ResetPasswordRequest() {}
-
-        public ResetPasswordRequest(String email, boolean resetPassword) {
-            this.email = email;
-            this.resetPassword = resetPassword;
-        }
-
     }
 
-    @Getter @Setter
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class SetPasswordRequest {
 
         public String email;
         public String password;
 
-        public SetPasswordRequest() {}
-
-        public SetPasswordRequest(String email, String password) {
-            this.email = email;
-            this.password = password;
-        }
-
     }
 
-    @Getter @Setter
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class AddXPRequest {
 
         public String email;
         public int xp;
-        // TODO: Add a reason option for tracking totals
-
-        public AddXPRequest() {}
-
-        public AddXPRequest(String email, int xp) {
-            this.email = email;
-            this.xp = xp;
-        }
+        public String reason;
 
     }
 

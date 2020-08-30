@@ -37,6 +37,7 @@ public class User implements UserDetails {
     public AvatarDataFemale avatarDataFemale;
     public AvatarDataColors avatarDataColors;
     public int xp;
+    public List<XpEntry> xpEntries;
     public int points;
     public List<Quest> quests;
     public List<GradedShortAnswerAssignment> gradedShortAnswerAssignments;
@@ -60,6 +61,7 @@ public class User implements UserDetails {
                 AvatarDataFemale avatarDataFemale,
                 AvatarDataColors avatarDataColors,
                 int xp,
+                List<XpEntry> xpEntries,
                 int points,
                 List<Quest> quests,
                 List<GradedShortAnswerAssignment> gradedShortAnswerAssignments,
@@ -80,6 +82,7 @@ public class User implements UserDetails {
                 avatarDataFemale,
                 avatarDataColors,
                 xp,
+                xpEntries,
                 points,
                 quests,
                 gradedShortAnswerAssignments,
@@ -103,6 +106,7 @@ public class User implements UserDetails {
                 AvatarDataFemale avatarDataFemale,
                 AvatarDataColors avatarDataColors,
                 int xp,
+                List<XpEntry> xpEntries,
                 int points,
                 List<Quest> quests,
                 List<GradedShortAnswerAssignment> gradedShortAnswerAssignments,
@@ -123,6 +127,7 @@ public class User implements UserDetails {
         this.avatarDataFemale = avatarDataFemale;
         this.avatarDataColors = avatarDataColors;
         this.xp = xp;
+        this.xpEntries = xpEntries;
         this.points = points;
         this.quests = quests;
         this.gradedShortAnswerAssignments = gradedShortAnswerAssignments;
@@ -166,6 +171,12 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void addXp(int changeAmount, String changeReason) {
+        this.setXp(this.getXp() + changeAmount);
+        if (this.getXpEntries() == null) this.xpEntries = new ArrayList<>();
+        this.getXpEntries().add(new XpEntry(changeAmount, changeReason));
     }
 
 }

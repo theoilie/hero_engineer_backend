@@ -190,7 +190,8 @@ public class ShortAnswerAssignmentController {
                     if (isProf) {
                         // Grade the assignment if the professor sent this request
                         updatedGradedAssignments.remove(otherGradedAssignment);
-                        user.setXp(user.getXp() + (gradedAssignment.getXpAwarded() - otherGradedAssignment.getXpAwarded()));
+                        user.addXp(gradedAssignment.getXpAwarded() - otherGradedAssignment.getXpAwarded(),
+                                "Completed in-class assignment: " + gradedAssignment.getName());
                         break;
                     } else {
                         // Don't allow a student to submit their assignment more than once
