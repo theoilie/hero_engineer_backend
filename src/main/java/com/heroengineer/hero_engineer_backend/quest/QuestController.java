@@ -94,12 +94,14 @@ public class QuestController {
 
     @PutMapping("/generateUniversalCode")
     public ResponseEntity<String> generateCodeForQuest(HttpServletRequest request, @Valid @RequestBody GenerateUniversalCodeRequest body) {
+        System.out.println("reached generateUniversalCode");
         if (!userService.isProf(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
         }
 
         Quest quest = questRepo.findById(body.getQuestId()).orElse(null);
         if (quest == null) {
+            System.out.println("quest is null");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"No quest with the given ID could be found.\"}");
         }
 
@@ -156,7 +158,7 @@ public class QuestController {
         String email = jwtTokenUtil.getUsernameFromRequest(request);
 
         if (email == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"JWT not accepted\"}");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"JWT_NOT_ACCEPTED\"}");
         }
 
         User user = userRepo.findByEmailIgnoreCase(email);
@@ -164,22 +166,22 @@ public class QuestController {
                 .filter(q -> q.getId().equals(code.getQuestId())).findFirst().orElse(null);
         Quest globalQuest = questRepo.findById(code.getQuestId()).orElse(null);
         if (userQuest == null || globalQuest == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"No user quest matches the ID given\"}");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"NO_QUEST_FOUND\"}");
         }
         String individualCode = (userQuest.getCode() == null || userQuest.getCode().isEmpty()) ? "" : userQuest.getCode();
         String universalCode = (globalQuest.getUniversalCode() == null || globalQuest.getUniversalCode().isEmpty()) ? "" : globalQuest.getUniversalCode();
         if ((!globalQuest.isCompleteWithCode() && !globalQuest.isCompleteWithQuizzesAndCode()) ||
                 (individualCode.isEmpty() && universalCode.isEmpty())) {
-            return ResponseEntity.ok().body("{\"error\": \"No code to complete this quest is available at this time.\"}");
+            return ResponseEntity.ok().body("{\"error\": \"NO_CODE_AVAILABLE\"}");
         }
         if (!individualCode.equals(code.getCode()) && !universalCode.equals(code.getCode())) {
-            return ResponseEntity.ok().body("{\"error\": \"Invalid code.\"}");
+            return ResponseEntity.ok().body("{\"error\": \"INVALID_CODE\"}");
         }
         if (userQuest.isCodeEnteredSuccessfully()) {
-            return ResponseEntity.ok().body("{\"error\": \"You have already successfully entered your code for this quest.\"}");
+            return ResponseEntity.ok().body("{\"error\": \"CODE_ALREADY_ENTERED\"}");
         }
         if (userQuest.isComplete()) {
-            return ResponseEntity.ok().body("{\"error\": \"You have already completed this quest.\"}");
+            return ResponseEntity.ok().body("{\"error\": \"QUEST_ALREADY_COMPLETED\"}");
         }
 
         if ((!globalQuest.isCompleteWithQuizzesAndCode() && globalQuest.isCompleteWithCode())
@@ -199,6 +201,7 @@ public class QuestController {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     private static class GenerateCodeRequest {
 
         public String userEmail;
@@ -208,6 +211,7 @@ public class QuestController {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     private static class GenerateUniversalCodeRequest {
 
         public String questId;
@@ -216,6 +220,7 @@ public class QuestController {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     private static class EnterCodeRequest {
 
         public String questId;
