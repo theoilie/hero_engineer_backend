@@ -1,33 +1,33 @@
 package com.heroengineer.hero_engineer_backend.herocouncil;
 
-import com.heroengineer.hero_engineer_backend.hero.Hero;
-import com.heroengineer.hero_engineer_backend.hero.HeroController;
-import com.heroengineer.hero_engineer_backend.hero.HeroRepository;
 import com.heroengineer.hero_engineer_backend.jwt.JwtTokenUtil;
-import com.heroengineer.hero_engineer_backend.quest.Quest;
-import com.heroengineer.hero_engineer_backend.quest.QuestController;
-import com.heroengineer.hero_engineer_backend.section.Section;
-import com.heroengineer.hero_engineer_backend.section.SectionRepository;
 import com.heroengineer.hero_engineer_backend.user.User;
 import com.heroengineer.hero_engineer_backend.user.UserRepository;
 import com.heroengineer.hero_engineer_backend.user.UserService;
 import com.heroengineer.hero_engineer_backend.util.UtilService;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -158,7 +158,7 @@ public class HeroCouncilController {
         }
     }
 
-    @PostMapping("/enterCode")
+    @PostMapping("/enterGrandChallengeCode")
     public ResponseEntity<String> enterCode(HttpServletRequest request, @RequestBody EnterCodeRequest body) {
         String email = jwtTokenUtil.getUsernameFromRequest(request);
 
@@ -180,7 +180,7 @@ public class HeroCouncilController {
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 
-    @PutMapping("/generateCode")
+    @PutMapping("/generateGrandChallengeCode")
     public ResponseEntity<String> generateCodeForGrandChallenge(HttpServletRequest request, @Valid @RequestBody GenerateCodeRequest body) {
         if (!userService.isProf(request)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
@@ -193,6 +193,32 @@ public class HeroCouncilController {
 
         grandChallenge.setCode(util.generateCode());
         grandChallengeRepo.save(grandChallenge);
+        return ResponseEntity.ok().body("{\"error\": \"\"}");
+    }
+
+    @PutMapping("/generateHeroCouncilCode")
+    public ResponseEntity<String> generateCodeForHeroCouncil(HttpServletRequest request, @Valid @RequestBody GenerateHeroCouncilCodeRequest body) {
+        if (!userService.isProf(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
+        }
+
+        HeroCouncil heroCouncil = repo.findById(body.getHeroCouncilId()).orElse(null);
+        if (heroCouncil == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"No hero council could be found with the given ID.\"}");
+        }
+
+        if (heroCouncil.getQuestInfos().isEmpty()) heroCouncil.setQuestInfos(new ArrayList<>());
+
+        for (HeroCouncil.QuestInfo questInfo : heroCouncil.getQuestInfos()) {
+            if (questInfo.getQuestId().equals(body.getQuestId())) {
+                questInfo.setCode(util.generateCode());
+                repo.save(heroCouncil);
+                return ResponseEntity.ok().body("{\"error\": \"\"}");
+            }
+        }
+
+        heroCouncil.getQuestInfos().add(new HeroCouncil.QuestInfo(body.getQuestId(), util.generateCode()));
+        repo.save(heroCouncil);
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 
@@ -248,30 +274,26 @@ public class HeroCouncilController {
                 .body(resource);
     }
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class EnterCodeRequest {
-
-        @Getter @Setter
         public String code;
-
-        public EnterCodeRequest() {}
-
-        public EnterCodeRequest(String code) {
-            this.code = code;
-        }
-
     }
 
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
     private static class GenerateCodeRequest {
-
-        @Getter @Setter
         public String grandChallengeId;
+    }
 
-        public GenerateCodeRequest() {}
-
-        public GenerateCodeRequest(String grandChallengeId) {
-            this.grandChallengeId = grandChallengeId;
-        }
-
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    private static class GenerateHeroCouncilCodeRequest {
+        public String heroCouncilId;
+        public String questId;
     }
 
 }

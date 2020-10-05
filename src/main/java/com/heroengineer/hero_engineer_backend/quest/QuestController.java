@@ -1,5 +1,7 @@
 package com.heroengineer.hero_engineer_backend.quest;
 
+import com.heroengineer.hero_engineer_backend.herocouncil.HeroCouncil;
+import com.heroengineer.hero_engineer_backend.herocouncil.HeroCouncilRepository;
 import com.heroengineer.hero_engineer_backend.jwt.JwtTokenUtil;
 import com.heroengineer.hero_engineer_backend.quiz.QuizService;
 import com.heroengineer.hero_engineer_backend.user.User;
@@ -9,11 +11,18 @@ import com.heroengineer.hero_engineer_backend.util.UtilService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -30,6 +39,7 @@ public class QuestController {
 
     private final QuestRepository questRepo;
     private final UserRepository userRepo;
+    private final HeroCouncilRepository heroCouncilRepo;
     private final UserService userService;
     private final QuestService questService;
     private final QuizService quizService;
@@ -39,6 +49,7 @@ public class QuestController {
     @Autowired
     public QuestController(QuestRepository questRepo,
                            UserRepository userRepo,
+                           HeroCouncilRepository heroCouncilRepo,
                            UserService userService,
                            QuestService questService,
                            QuizService quizService,
@@ -46,6 +57,7 @@ public class QuestController {
                            UtilService util) {
         this.questRepo = questRepo;
         this.userRepo = userRepo;
+        this.heroCouncilRepo = heroCouncilRepo;
         this.userService = userService;
         this.questService = questService;
         this.quizService = quizService;
@@ -162,6 +174,13 @@ public class QuestController {
         }
 
         User user = userRepo.findByEmailIgnoreCase(email);
+        HeroCouncil heroCouncil = null;
+        for (HeroCouncil heroCouncil1 : heroCouncilRepo.findAll()) {
+            if (heroCouncil1.getEmails().stream().anyMatch(email1 -> email1.equalsIgnoreCase(email))) {
+                heroCouncil = heroCouncil1;
+                break;
+            }
+        }
         Quest userQuest = user.getQuests().stream()
                 .filter(q -> q.getId().equals(code.getQuestId())).findFirst().orElse(null);
         Quest globalQuest = questRepo.findById(code.getQuestId()).orElse(null);
@@ -170,11 +189,12 @@ public class QuestController {
         }
         String individualCode = (userQuest.getCode() == null || userQuest.getCode().isEmpty()) ? "" : userQuest.getCode();
         String universalCode = (globalQuest.getUniversalCode() == null || globalQuest.getUniversalCode().isEmpty()) ? "" : globalQuest.getUniversalCode();
+        String heroCouncilCode = heroCouncil == null ? "" : heroCouncil.getCodeForQuestId(code.getQuestId());
         if ((!globalQuest.isCompleteWithCode() && !globalQuest.isCompleteWithQuizzesAndCode()) ||
-                (individualCode.isEmpty() && universalCode.isEmpty())) {
+                (individualCode.isEmpty() && universalCode.isEmpty() && heroCouncilCode.isEmpty())) {
             return ResponseEntity.ok().body("{\"error\": \"NO_CODE_AVAILABLE\"}");
         }
-        if (!individualCode.equals(code.getCode()) && !universalCode.equals(code.getCode())) {
+        if (!individualCode.equals(code.getCode()) && !universalCode.equals(code.getCode()) && !heroCouncilCode.equals(code.getCode())) {
             return ResponseEntity.ok().body("{\"error\": \"INVALID_CODE\"}");
         }
         if (userQuest.isCodeEnteredSuccessfully()) {

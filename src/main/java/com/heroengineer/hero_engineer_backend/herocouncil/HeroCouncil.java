@@ -1,65 +1,65 @@
 package com.heroengineer.hero_engineer_backend.herocouncil;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * MongoDB representation of a Hero Council.
  */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class HeroCouncil {
 
-    @Id @Getter @Setter
+    @Id
     public String id;
-    @Getter @Setter
     public String name;
-    @Getter @Setter
     public List<String> emails; // Emails of students in this Hero Council
-    @Getter @Setter
     public boolean approved; // Whether or not the professor has approved this Hero Council
-    @Getter @Setter
     public String declarationFileName;
-    @Getter @Setter
     public List<Announcement> announcements;
-
-    public HeroCouncil() {}
+    public List<QuestInfo> questInfos; // Info about each quest that is specific to this Hero Council (e.g. a quest code)
 
     public HeroCouncil(String name, List<String> emails, boolean approved, String declarationFileName) {
         this.name = name;
         this.emails = emails;
         this.approved = approved;
         this.declarationFileName = declarationFileName;
+        this.announcements = new ArrayList<>();
+        this.questInfos = new ArrayList<>();
     }
 
-    public HeroCouncil(String id, String name, List<String> emails, boolean approved, String declarationFileName) {
-        this.id = id;
-        this.name = name;
-        this.emails = emails;
-        this.approved = approved;
-        this.declarationFileName = declarationFileName;
+    public String getCodeForQuestId(String questId) {
+        if (questId == null || getQuestInfos() == null) return "";
+        for (QuestInfo questInfo : getQuestInfos()) {
+            if (questId.equals(questInfo.getQuestId())) {
+                return questInfo.getCode();
+            }
+        }
+        return "";
     }
 
-    @Override
-    public String toString() {
-        return String.format("HeroCouncil[id=%s, name=%s, emails=%s, approved=%s, declarationFileName=%s]",
-                id, name, String.join(",", emails), approved, declarationFileName);
-    }
-
-    @Getter @Setter
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Announcement {
-
         public int num; // Used for ordering -- to display announcements in ascending order on frontend
         public String text;
+    }
 
-        public Announcement() {}
-
-        public Announcement(int num, String text) {
-            this.num = num;
-            this.text = text;
-        }
-
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class QuestInfo {
+        public String questId;
+        public String code;
     }
 
 }
