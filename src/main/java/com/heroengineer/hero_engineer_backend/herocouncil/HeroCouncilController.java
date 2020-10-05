@@ -207,7 +207,7 @@ public class HeroCouncilController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("{\"error\": \"No hero council could be found with the given ID.\"}");
         }
 
-        if (heroCouncil.getQuestInfos().isEmpty()) heroCouncil.setQuestInfos(new ArrayList<>());
+        if (heroCouncil.getQuestInfos() == null) heroCouncil.setQuestInfos(new ArrayList<>());
 
         for (HeroCouncil.QuestInfo questInfo : heroCouncil.getQuestInfos()) {
             if (questInfo.getQuestId().equals(body.getQuestId())) {
