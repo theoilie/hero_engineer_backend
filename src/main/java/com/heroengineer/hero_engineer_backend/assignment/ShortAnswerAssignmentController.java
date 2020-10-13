@@ -184,14 +184,18 @@ public class ShortAnswerAssignmentController {
             if (user.getGradedShortAnswerAssignments() == null) user.setGradedShortAnswerAssignments(new ArrayList<>());
 
             // Remove the old assignment object from the student's data before adding the updated assignment object
+            boolean firstTimeGrading = true;
             List<GradedShortAnswerAssignment> updatedGradedAssignments = new ArrayList<>(user.getGradedShortAnswerAssignments());
             for (GradedShortAnswerAssignment otherGradedAssignment : user.getGradedShortAnswerAssignments()) {
                 if (otherGradedAssignment.getId().equals(gradedAssignment.getId())) {
                     if (isProf) {
                         // Grade the assignment if the professor sent this request
+                        firstTimeGrading = false;
                         updatedGradedAssignments.remove(otherGradedAssignment);
-                        user.addXp(gradedAssignment.getXpAwarded() - otherGradedAssignment.getXpAwarded(),
-                                "Completed in-class assignment: " + gradedAssignment.getName());
+                        int changeAmount = gradedAssignment.getXpAwarded() - otherGradedAssignment.getXpAwarded();
+                        if (changeAmount != 0) {
+                            user.addXp(changeAmount, "Updated grade for in-class assignment: " + gradedAssignment.getName());
+                        }
                         break;
                     } else {
                         // Don't allow a student to submit their assignment more than once
@@ -202,6 +206,9 @@ public class ShortAnswerAssignmentController {
 
             updatedGradedAssignments.add(gradedAssignment);
             user.setGradedShortAnswerAssignments(updatedGradedAssignments);
+            if (firstTimeGrading) {
+                user.addXp(gradedAssignment.getXpAwarded(), "Completed in-class assignment: " + gradedAssignment.getName());
+            }
             userRepo.save(user);
             break;
         }
