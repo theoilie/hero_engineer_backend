@@ -280,6 +280,27 @@ public class UserController {
         return ResponseEntity.ok().body(breakdown);
     }
 
+    @GetMapping("/XPHistory/{email}")
+    public ResponseEntity<?> getXPHistory(HttpServletRequest request, @PathVariable String email) {
+        if (!userService.isProf(request)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"You are not the professor.\"}");
+        }
+
+        User user = userRepo.findByEmailIgnoreCase(email);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("{\"error\": \"No user was found for the email provided.\"}");
+        }
+
+        if (user.getXpEntries() == null) user.setXpEntries(new ArrayList<>());
+        int total = 0;
+        for (XpEntry entry : user.getXpEntries()) {
+            total += entry.getXpChangeAmount();
+        }
+        user.getXpEntries().add(new XpEntry(total, "Total"));
+
+        return ResponseEntity.ok().body(user.getXpEntries());
+    }
+
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
