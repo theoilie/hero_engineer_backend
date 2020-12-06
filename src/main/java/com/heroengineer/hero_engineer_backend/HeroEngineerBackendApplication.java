@@ -2,7 +2,7 @@ package com.heroengineer.hero_engineer_backend;
 
 import com.heroengineer.hero_engineer_backend.hero.Hero;
 import com.heroengineer.hero_engineer_backend.hero.HeroRepository;
-import com.heroengineer.hero_engineer_backend.herocouncil.FileStorageProperties;
+import com.heroengineer.hero_engineer_backend.util.file.FileStorageProperties;
 import com.heroengineer.hero_engineer_backend.herocouncil.GrandChallenge;
 import com.heroengineer.hero_engineer_backend.herocouncil.GrandChallengeRepository;
 import com.heroengineer.hero_engineer_backend.quest.Quest;

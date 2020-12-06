@@ -1,4 +1,4 @@
-package com.heroengineer.hero_engineer_backend.herocouncil;
+package com.heroengineer.hero_engineer_backend.util.file;
 
 public class FileStorageException extends RuntimeException {
 

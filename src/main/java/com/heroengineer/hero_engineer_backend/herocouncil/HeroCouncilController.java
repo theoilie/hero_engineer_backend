@@ -5,6 +5,7 @@ import com.heroengineer.hero_engineer_backend.user.User;
 import com.heroengineer.hero_engineer_backend.user.UserRepository;
 import com.heroengineer.hero_engineer_backend.user.UserService;
 import com.heroengineer.hero_engineer_backend.util.UtilService;
+import com.heroengineer.hero_engineer_backend.util.file.FileStorageService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -239,7 +240,7 @@ public class HeroCouncilController {
         }
         council = repo.save(council);
 
-        String fileName = fileStorageService.storeFile(council.getId(), file);
+        String fileName = fileStorageService.storeHeroCouncilFile(council.getId(), file);
         council.setDeclarationFileName(fileName);
         repo.save(council);
         return ResponseEntity.ok().build();
@@ -252,7 +253,7 @@ public class HeroCouncilController {
         }
 
         // Load file as Resource
-        Resource resource = fileStorageService.loadFileAsResource(fileName);
+        Resource resource = fileStorageService.loadHeroCouncilFileAsResource(fileName);
 
         // Try to determine file's content type
         String contentType = null;
@@ -263,7 +264,7 @@ public class HeroCouncilController {
         }
 
         // Fallback to the default content type if type could not be determined
-        if(contentType == null) {
+        if (contentType == null) {
             contentType = "application/octet-stream";
         }
 
