@@ -195,8 +195,7 @@ public class UserController {
 
         User user = userRepo.findByEmailIgnoreCase(email);
         user.setAvatarSVG(body.getAvatarSVG());
-        user.setAvatarDataMale(body.getAvatarDataMale());
-        user.setAvatarDataFemale(body.getAvatarDataFemale());
+        user.setAvatarData(body.getAvatarData());
         user.setAvatarDataColors(body.getAvatarDataColors());
         userRepo.save(user);
 
@@ -316,8 +315,7 @@ public class UserController {
     private static class UpdateAvatarRequest {
 
         public String avatarSVG;
-        public AvatarDataMale avatarDataMale;
-        public AvatarDataFemale avatarDataFemale;
+        public AvatarData avatarData;
         public AvatarDataColors avatarDataColors;
 
     }

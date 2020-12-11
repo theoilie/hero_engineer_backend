@@ -9,7 +9,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
 
 /**
  * REST controller for avatars.
@@ -23,14 +27,9 @@ public class AvatarsController {
     @Autowired
     ResourceLoader resourceLoader;
 
-    @GetMapping(value="/json/svgavatars-male-data", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value="/json/svgavatars-data", produces = MediaType.APPLICATION_JSON_VALUE)
     public String getMaleData() {
         return getJson("avatars/svgavatars-male-data.json");
-    }
-
-    @GetMapping(value="/json/svgavatars-female-data", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String getFemaleData() {
-        return getJson("avatars/svgavatars-female-data.json");
     }
 
     private String getJson(String fileName) {

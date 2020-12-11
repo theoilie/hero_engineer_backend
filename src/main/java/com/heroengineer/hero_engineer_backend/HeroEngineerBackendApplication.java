@@ -77,7 +77,7 @@ public class HeroEngineerBackendApplication {
                     "",
                     null,
                     null,
-                    null,
+                    new ArrayList<>(),
                     0,
                     new ArrayList<>(),
                     0,

@@ -33,9 +33,9 @@ public class User implements UserDetails {
     public String password;
     public String heroId;
     public String avatarSVG;
-    public AvatarDataMale avatarDataMale;
-    public AvatarDataFemale avatarDataFemale;
+    public AvatarData avatarData;
     public AvatarDataColors avatarDataColors;
+    public List<String> avatarUnlockedBodyZoneShapes;
     public int xp;
     public List<XpEntry> xpEntries;
     public int points;
@@ -57,9 +57,9 @@ public class User implements UserDetails {
                 String password,
                 String heroId,
                 String avatarSVG,
-                AvatarDataMale avatarDataMale,
-                AvatarDataFemale avatarDataFemale,
+                AvatarData avatarData,
                 AvatarDataColors avatarDataColors,
+                List<String> avatarUnlockedBodyZoneShapes,
                 int xp,
                 List<XpEntry> xpEntries,
                 int points,
@@ -78,9 +78,9 @@ public class User implements UserDetails {
                 password,
                 heroId,
                 avatarSVG,
-                avatarDataMale,
-                avatarDataFemale,
+                avatarData,
                 avatarDataColors,
+                avatarUnlockedBodyZoneShapes,
                 xp,
                 xpEntries,
                 points,
@@ -102,9 +102,9 @@ public class User implements UserDetails {
                 String password,
                 String heroId,
                 String avatarSVG,
-                AvatarDataMale avatarDataMale,
-                AvatarDataFemale avatarDataFemale,
+                AvatarData avatarData,
                 AvatarDataColors avatarDataColors,
+                List<String> avatarUnlockedBodyZoneShapes,
                 int xp,
                 List<XpEntry> xpEntries,
                 int points,
@@ -123,9 +123,9 @@ public class User implements UserDetails {
         this.password = password;
         this.heroId = heroId;
         this.avatarSVG = avatarSVG;
-        this.avatarDataMale = avatarDataMale;
-        this.avatarDataFemale = avatarDataFemale;
+        this.avatarData = avatarData;
         this.avatarDataColors = avatarDataColors;
+        this.avatarUnlockedBodyZoneShapes = avatarUnlockedBodyZoneShapes;
         this.xp = xp;
         this.xpEntries = xpEntries;
         this.points = points;
