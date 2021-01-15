@@ -1,51 +1,29 @@
 package com.heroengineer.hero_engineer_backend.user;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * MongoDB representation of a the colors of each body part
+ * MongoDB representation of a the HEX color of each body zone
  */
-@Getter @Setter
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class AvatarDataColors {
 
-    public int backs;
-    public int beard;
-    public int chinshadow;
-    public int clothes;
-    public int ears;
-    public int eyebrows;
-    public int eyesback;
-    public int eyesfront;
-    public int eyesiris;
-    public int facehighlight;
-    public int faceshape;
-    public int glasses;
-    public int hair;
-    public int humanbody;
-    public int mouth;
-    public int mustache;
-    public int nose;
+    public String backs;
+    public String skin;
+    public String mouth;
+    public String clothes;
+    public String eyebrows;
+    public String eyesback;
+    public String eyesfront;
+    public String eyesiris;
+    public String glasses;
+    public String hair;
+    public String mustache;
 
-    public AvatarDataColors() {}
-
-    public AvatarDataColors(int backs, int beard, int chinshadow, int clothes, int ears, int eyebrows, int eyesback, int eyesfront, int eyesiris, int facehighlight, int faceshape, int glasses, int hair, int humanbody, int mouth, int mustache, int nose) {
-        this.backs = backs;
-        this.beard = beard;
-        this.chinshadow = chinshadow;
-        this.clothes = clothes;
-        this.ears = ears;
-        this.eyebrows = eyebrows;
-        this.eyesback = eyesback;
-        this.eyesfront = eyesfront;
-        this.eyesiris = eyesiris;
-        this.facehighlight = facehighlight;
-        this.faceshape = faceshape;
-        this.glasses = glasses;
-        this.hair = hair;
-        this.humanbody = humanbody;
-        this.mouth = mouth;
-        this.mustache = mustache;
-        this.nose = nose;
-    }
 }

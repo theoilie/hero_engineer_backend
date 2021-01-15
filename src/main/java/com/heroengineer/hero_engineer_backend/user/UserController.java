@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -202,6 +203,21 @@ public class UserController {
         return ResponseEntity.ok().body("{\"error\": \"\"}");
     }
 
+    @PostMapping("/updateUnlockedAvatarOptions")
+    public ResponseEntity<String> updateUnlockedAvatarOptions(HttpServletRequest request, @RequestBody UpdateUnlockedAvatarOptionsRequest body) {
+        String email = jwtTokenUtil.getUsernameFromRequest(request);
+
+        if (email == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"JWT not accepted\"}");
+        }
+
+        User user = userRepo.findByEmailIgnoreCase(email);
+        user.setAvatarUnlockedBodyZoneShapes(body.getUnlockedAvatarOptions());
+        userRepo.save(user);
+
+        return ResponseEntity.ok().body("{\"error\": \"\"}");
+    }
+
     @PostMapping("/setIdeas")
     public ResponseEntity<String> setIdeas(HttpServletRequest request, @RequestBody SetIdeasRequest body) {
         String email = jwtTokenUtil.getUsernameFromRequest(request);
@@ -317,6 +333,15 @@ public class UserController {
         public String avatarSVG;
         public AvatarData avatarData;
         public AvatarDataColors avatarDataColors;
+
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    private static class UpdateUnlockedAvatarOptionsRequest {
+
+        public List<String> unlockedAvatarOptions;
 
     }
 
