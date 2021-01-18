@@ -25,5 +25,6 @@ public class AvatarDataColors {
     public String glasses;
     public String hair;
     public String mustache;
+    public String beard;
 
 }
