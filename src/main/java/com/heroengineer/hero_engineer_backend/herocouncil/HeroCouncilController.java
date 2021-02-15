@@ -69,24 +69,23 @@ public class HeroCouncilController {
         this.util = util;
     }
 
-    @GetMapping("/herocouncils")
+    @GetMapping("/allHeroCouncils")
     public List<HeroCouncil> getAll() {
         return repo.findAll();
     }
 
-    @GetMapping("/herocouncil")
+    @GetMapping("/myHeroCouncils")
     public ResponseEntity<?> get(HttpServletRequest request) {
         String email = jwtTokenUtil.getUsernameFromRequest(request);
 
         if (email == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"error\": \"JWT not accepted\"}");
         }
-        for (HeroCouncil heroCouncil : repo.findAll()) {
-            if (heroCouncil.getEmails().stream().anyMatch(email1 -> email1.equalsIgnoreCase(email))) {
-                return ResponseEntity.ok().body(heroCouncil);
-            }
-        }
-        return ResponseEntity.ok().body(null);
+        List<HeroCouncil> heroCouncils = repo.findAll()
+                                             .stream()
+                                             .filter(heroCouncil -> heroCouncil.getEmails().stream().anyMatch(email1 -> email1.equalsIgnoreCase(email)))
+                                             .collect(Collectors.toList());
+        return ResponseEntity.ok().body(heroCouncils);
     }
 
     @PostMapping("/save")
@@ -100,7 +99,7 @@ public class HeroCouncilController {
                 // Save pre-existing council
                 repo.save(council);
             } else {
-                // No ID given -- find pre-existing council and update it
+                // No ID given -- find pre-existing skeleton council and update it
                 updateCouncil(council, userEmail);
             }
         } else {
@@ -116,8 +115,10 @@ public class HeroCouncilController {
 
     private void updateCouncil(HeroCouncil council, String userEmail) {
         for (HeroCouncil otherCouncil : repo.findAll()) {
-            // Make sure the student is in the council that he/she is creating
-            // Find the ID from the Hero Council that was created from file/Declaration upload
+            // If the student is creating a 2nd or nth council, don't overwrite a 1st or (n-1)th council
+            if (otherCouncil.isApproved()) continue;
+
+            // Make sure the student is in the council that he/she is creating, and overwrite the the new council onto the skeleton (which only has ID and declaration)
             if (otherCouncil.getEmails().stream().anyMatch(email -> email != null && email.equalsIgnoreCase(userEmail))) {
                 council.setId(otherCouncil.getId());
                 council.setDeclarationFileName(otherCouncil.getDeclarationFileName());
@@ -126,7 +127,7 @@ public class HeroCouncilController {
             }
         }
 
-        // Doesn't match any other council -- make a new council
+        // Doesn't match any other council -- make a new council skeleton
         repo.save(council);
     }
 
@@ -230,6 +231,9 @@ public class HeroCouncilController {
         // Make a new Hero Council for the file if the user doesn't already have a council
         HeroCouncil council = null;
         for (HeroCouncil otherCouncil : repo.findAll()) {
+            // If the student is creating a 2nd or nth council, don't overwrite a 1st or (n-1)th council
+            if (otherCouncil.isApproved()) continue;
+
             if (otherCouncil.getEmails().stream().anyMatch(email -> email != null && email.equalsIgnoreCase(userEmail))) {
                 council = otherCouncil;
                 break;
